@@ -1,0 +1,25 @@
+.plan-summary {
+  &--new-plan {}
+  &--new-plan-indicator {}
+  &__semi_annulus {
+    img {}
+  }
+  &__small_annulus {
+    img {}
+  }
+  &__square {
+    img {}
+  }
+  &__plan__name {}
+  &__plan__savings-label {}
+  &__plan__savings-amount {}
+  &__plan__savings-return {}
+  &__plan__old-plan-container {
+    &__row1 {
+      &__icon {}
+      &__text {}
+    }
+    &__row2 {}
+  }
+  &__plan__contribute {}
+}

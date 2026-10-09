@@ -1,0 +1,24 @@
+.page {
+  &__header {
+    &--sticky {}
+    &__nav {
+      &__list {
+        &__nav-item {
+          &--active {}
+          &__nav-link {}
+        }
+      }
+    }
+  }
+  &__content {}
+  .content {
+    &__section {
+      &--featured {}
+      .article {
+        &--highlighted {}
+        &__title {}
+      }
+    }
+    &__title {}
+  }
+}

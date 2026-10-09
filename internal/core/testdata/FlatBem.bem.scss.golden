@@ -1,0 +1,11 @@
+.card {
+  &--featured {}
+  &__header {}
+  &__title {}
+  &__body {}
+  &__text {}
+  &__footer {}
+  &__link {
+    &--primary {}
+  }
+}

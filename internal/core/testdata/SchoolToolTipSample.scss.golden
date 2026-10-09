@@ -1,0 +1,21 @@
+.school-pin-tooltip {
+  &__content {
+    &__school-name {}
+    &__location {}
+    &__tuition {
+      &__text {}
+      &__total {}
+      &__yr {}
+    }
+    &__distance-programs {
+      &__car-icon {}
+      &__details {
+        span {}
+      }
+      &__program {
+        &__program-icon {}
+        &__details {}
+      }
+    }
+  }
+}

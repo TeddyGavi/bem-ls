@@ -1,0 +1,15 @@
+.list {
+  &--open {}
+  &--active {}
+  &__item {
+    &--small {}
+  }
+  &__button {}
+  &__empty {
+    &--visible {}
+  }
+}
+
+.badge {
+  &__icon {}
+}
