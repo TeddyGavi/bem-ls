@@ -1,0 +1,12 @@
+21:25 info nestedElement: "school-pin-tooltip__content__school-name" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__school-name"?)
+24:25 info nestedElement: "school-pin-tooltip__content__location" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__location"?)
+27:25 info nestedElement: "school-pin-tooltip__content__tuition" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__tuition"?)
+28:28 info nestedElement: "school-pin-tooltip__content__tuition__text" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__text"?)
+31:28 info nestedElement: "school-pin-tooltip__content__tuition__total" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__total"?)
+34:28 info nestedElement: "school-pin-tooltip__content__tuition__yr" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__yr"?)
+38:25 info nestedElement: "school-pin-tooltip__content__distance-programs" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__distance-programs"?)
+40:24 info nestedElement: "school-pin-tooltip__content__distance-programs__car-icon" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__car-icon"?)
+44:27 info nestedElement: "school-pin-tooltip__content__distance-programs__details" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip"
+49:27 info nestedElement: "school-pin-tooltip__content__distance-programs__program" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__program"?)
+51:26 info nestedElement: "school-pin-tooltip__content__distance-programs__program__program-icon" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip" (did you mean "school-pin-tooltip__program-icon"?)
+55:29 info nestedElement: "school-pin-tooltip__content__distance-programs__program__details" is an element of an element; BEM elements belong directly to the block "school-pin-tooltip"

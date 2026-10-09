@@ -1,0 +1,7 @@
+3:21 info nestedElement: "page__header__nav" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav"?)
+4:22 info nestedElement: "page__header__nav__list" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__list"?)
+5:24 info nestedElement: "page__header__nav__list__nav-item" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav-item"?)
+5:58 info nestedElement: "page__header__nav__list__nav-item--active" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav-item--active"?)
+6:34 info nestedElement: "page__header__nav__list__nav-item__nav-link" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav-link"?)
+8:24 info nestedElement: "page__header__nav__list__nav-item" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav-item"?)
+9:34 info nestedElement: "page__header__nav__list__nav-item__nav-link" is an element of an element; BEM elements belong directly to the block "page" (did you mean "page__nav-link"?)

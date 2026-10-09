@@ -65,6 +65,14 @@ func TestNestingFlag(t *testing.T) {
 	}
 }
 
+func TestNamingFlag(t *testing.T) {
+	src := `<div className="Card"><h2 className="Card-title Card-title_big"/></div>`
+	code, out, errOut := runCLI(t, src, "-naming", "react")
+	if want := ".Card {\n  &-title {\n    &_big {}\n  }\n}\n"; code != 0 || out != want {
+		t.Errorf("exit %d, stdout %q, stderr %q; want %q", code, out, errOut, want)
+	}
+}
+
 func TestParseErrorsExitNonZero(t *testing.T) {
 	src := "<div className=\"a\">\n  <p className=\"a__b\">"
 	code, out, errOut := runCLI(t, src)
@@ -95,6 +103,8 @@ func TestErrors(t *testing.T) {
 		{[]string{"-i", "/does/not/exist.jsx"}, 1, "jsx2scss: open /does/not/exist.jsx: no such file or directory"},
 		{[]string{"-nesting", "tree"}, 2, `unknown nesting "tree"`},
 		{[]string{"-indent", "x"}, 2, `invalid -indent "x"`},
+		{[]string{"-naming", "bootstrap"}, 2, `unknown naming preset "bootstrap"`},
+		{[]string{"-naming", "custom"}, 2, "needs a config file"},
 		{[]string{"-bogus"}, 2, "flag provided but not defined: -bogus"},
 		{[]string{"a.jsx", "b.jsx"}, 2, "too many arguments"},
 		{[]string{"-i", "a.jsx", "b.jsx"}, 2, "both by -i and as an argument"},

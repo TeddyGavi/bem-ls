@@ -3,6 +3,7 @@ package generator
 import (
 	"testing"
 
+	"scss-bem-gen/internal/bem"
 	"scss-bem-gen/internal/core"
 )
 
@@ -102,5 +103,42 @@ func TestParseNesting(t *testing.T) {
 	}
 	if _, err := ParseNesting("tree"); err == nil {
 		t.Error("ParseNesting(tree) succeeded")
+	}
+}
+
+func TestGenerateNamingPresets(t *testing.T) {
+	tests := []struct {
+		preset  string
+		nesting Nesting
+		src     string
+		want    string
+	}{
+		{
+			preset: bem.PresetReact,
+			src: `<div className="Card Card_active"><h2 className="Card-title Card-title_size_lg"/>` +
+				`<div className="Card-body"><p className="Card-text"/></div></div>`,
+			want: ".Card {\n  &_active {}\n  &-title {\n    &_size_lg {}\n  }\n  &-body {}\n  &-text {}\n}\n",
+		},
+		{
+			preset:  bem.PresetReact,
+			nesting: NestingBEM,
+			src:     `<p className="Card-text"/><div className="Badge"/>`,
+			want:    ".Card {\n  &-text {}\n}\n\n.Badge {}\n",
+		},
+		{
+			preset: bem.PresetKV,
+			src:    `<button className="btn btn--size_lg btn--disabled"><i className="btn__icon btn__icon--pos_left"/></button>`,
+			want:   ".btn {\n  &--size_lg {}\n  &--disabled {}\n  &__icon {\n    &--pos_left {}\n  }\n}\n",
+		},
+	}
+	for _, tt := range tests {
+		n, err := bem.NewNaming(bem.NamingConfig{Preset: tt.preset})
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := gen(t, tt.src, Options{Naming: n, Nesting: tt.nesting})
+		if got != tt.want {
+			t.Errorf("%s/%v:\ngot:\n%s\nwant:\n%s", tt.preset, tt.nesting, got, tt.want)
+		}
 	}
 }

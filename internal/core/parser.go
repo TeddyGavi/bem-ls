@@ -57,17 +57,24 @@ type ClassRef struct {
 	Name  string
 	Range Range
 	Kind  ClassKind
+	// Module is the identifier a ClassModule reference goes through, e.g.
+	// "styles" for styles.button. It is empty for other kinds.
+	Module string
 }
 
 // Node is a JSX element. The tree returned by Parser.Root has a virtual
 // root (Parent == nil) whose children are the top-level elements.
 type Node struct {
 	Tag         string // "" for fragments and the root
+	TagRange    Range  // range of Tag in the opening tag
 	Classes     []ClassRef
 	Range       Range // from '<' to the end of the closing tag or "/>"
 	SelfClosing bool
 	Children    []*Node
 	Parent      *Node
+	// Styled is the styled-component definition this element renders, if
+	// it is defined in the same file.
+	Styled *StyledDef
 }
 
 // IsRoot reports whether n is the virtual root.
@@ -113,8 +120,14 @@ type Parser struct {
 	ClassAttrs []string
 	// ClassFuncs are helpers whose arguments are class names, like clsx.
 	ClassFuncs []string
-	// ModuleIdents are the identifiers that refer to an imported CSS module.
+	// ModuleIdents are identifiers treated as CSS modules even without an
+	// import, e.g. a styles prop. Identifiers bound by a stylesheet import
+	// (import s from './x.module.scss') are added automatically.
 	ModuleIdents []string
+	// StyledIdents are the styled-components factories: styled.div``.
+	StyledIdents []string
+	// CSSHelpers are the template tags holding CSS, like css``.
+	CSSHelpers map[string]StyledKind
 
 	tokens  <-chan Item
 	root    *Node
@@ -122,6 +135,12 @@ type Parser struct {
 	stack   []*Node // stack[0] is root
 	peeked  []Item
 	errs    ErrorList
+
+	imports      []Import
+	moduleIdents []string // bound by stylesheet imports
+	styled       []*StyledDef
+	templates    []templateFrame
+	recent       []Item // last tokens, for looking back
 }
 
 // NewParser returns a parser reading from tokens, as returned by Lex.
@@ -131,6 +150,8 @@ func NewParser(tokens <-chan Item) *Parser {
 		ClassAttrs:   []string{"className", "class"},
 		ClassFuncs:   []string{"clsx", "classnames", "classNames", "cx", "cn", "twMerge", "twJoin"},
 		ModuleIdents: []string{"styles", "classes"},
+		StyledIdents: []string{"styled"},
+		CSSHelpers:   DefaultCSSHelpers,
 		tokens:       tokens,
 		root:         root,
 		current:      root,
@@ -141,10 +162,8 @@ func NewParser(tokens <-chan Item) *Parser {
 // ParseString lexes and parses src. The tree is returned even when err is
 // not nil, so callers can use partial results.
 func ParseString(name, src string) (*Node, error) {
-	_, tokens := Lex(name, src)
-	p := NewParser(tokens)
-	err := p.Parse()
-	return p.Root(), err
+	f, err := ParseFile(name, src)
+	return f.Root, err
 }
 
 // Root returns the virtual root of the parsed tree.
@@ -166,6 +185,10 @@ func (p *Parser) Parse() error {
 			p.parseElement(it)
 		case itemTagCloseOpen:
 			p.parseClosingTag(it)
+		case itemIdent:
+			if it.Val == "import" {
+				p.parseImport(it)
+			}
 		}
 	}
 }
@@ -174,6 +197,7 @@ func (p *Parser) parseElement(open Item) {
 	n := &Node{Range: Range{Start: startPos(open)}}
 	if name := p.next(); name.Typ == itemTagName {
 		n.Tag = name.Val
+		n.TagRange = rangeOf(name)
 	} else {
 		p.unread(name)
 	}
@@ -332,6 +356,7 @@ func (p *Parser) next() Item {
 			p.errs = append(p.errs, &Error{Pos: startPos(it), Msg: it.Val})
 			continue
 		}
+		p.observe(it)
 		return it
 	}
 	return Item{Typ: itemEOF}
@@ -485,11 +510,11 @@ func (p *Parser) extractClasses(toks []Item) []ClassRef {
 		case itemIdent:
 			next := tok(i + 1)
 			switch {
-			case contains(p.ModuleIdents, it.Val) && next.Typ == itemDot && tok(i+2).Typ == itemIdent:
-				refs = append(refs, ClassRef{Name: tok(i + 2).Val, Range: rangeOf(tok(i + 2)), Kind: ClassModule})
+			case p.isModuleIdent(it.Val) && next.Typ == itemDot && tok(i+2).Typ == itemIdent:
+				refs = append(refs, ClassRef{Name: tok(i + 2).Val, Range: rangeOf(tok(i + 2)), Kind: ClassModule, Module: it.Val})
 				i += 2
-			case contains(p.ModuleIdents, it.Val) && next.Typ == itemBracketString:
-				refs = append(refs, ClassRef{Name: next.Val, Range: rangeOf(next), Kind: ClassModule})
+			case p.isModuleIdent(it.Val) && next.Typ == itemBracketString:
+				refs = append(refs, ClassRef{Name: next.Val, Range: rangeOf(next), Kind: ClassModule, Module: it.Val})
 				i++
 			case f.kind == '{' && !f.skip && !f.objValue && isPunct(next, ":") && tok(i-1).Typ != itemDot:
 				refs = append(refs, ClassRef{Name: it.Val, Range: rangeOf(it), Kind: ClassConditional})
@@ -514,6 +539,10 @@ func (p *Parser) extractClasses(toks []Item) []ClassRef {
 	}
 	sortRefs(refs)
 	return refs
+}
+
+func (p *Parser) isModuleIdent(id string) bool {
+	return contains(p.ModuleIdents, id) || contains(p.moduleIdents, id)
 }
 
 // wordsOf splits it.Val[from:to] on whitespace into ClassRefs. Words glued

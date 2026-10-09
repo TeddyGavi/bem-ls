@@ -1,0 +1,13 @@
+4:57 warning modifierWithoutBase: modifier "plan-summary--new-plan-indicator" is used without "plan-summary" on the same element
+5:25 warning invalidName: "plan-summary__semi_annulus" does not follow the classic naming convention: element "semi_annulus" does not match lower-case kebab-case (e.g. my-name) (did you mean "plan-summary__semi-annulus"?)
+6:25 warning invalidName: "plan-summary__small_annulus" does not follow the classic naming convention: element "small_annulus" does not match lower-case kebab-case (e.g. my-name) (did you mean "plan-summary__small-annulus"?)
+8:25 info nestedElement: "plan-summary__plan__name" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__name"?)
+9:25 info nestedElement: "plan-summary__plan__savings-label" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__savings-label"?)
+10:25 info nestedElement: "plan-summary__plan__savings-amount" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__savings-amount"?)
+11:25 info nestedElement: "plan-summary__plan__savings-return" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__savings-return"?)
+16:31 info nestedElement: "plan-summary__plan__old-plan-container" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__old-plan-container"?)
+17:31 info nestedElement: "plan-summary__plan__old-plan-container__row1" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__row1"?)
+18:33 info nestedElement: "plan-summary__plan__old-plan-container__row1__icon" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__icon"?)
+19:33 info nestedElement: "plan-summary__plan__old-plan-container__row1__text" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__text"?)
+21:31 info nestedElement: "plan-summary__plan__old-plan-container__row2" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__row2"?)
+27:34 info nestedElement: "plan-summary__plan__contribute" is an element of an element; BEM elements belong directly to the block "plan-summary" (did you mean "plan-summary__contribute"?)

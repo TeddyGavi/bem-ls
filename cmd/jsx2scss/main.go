@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	"scss-bem-gen/internal/bem"
 	"scss-bem-gen/internal/core"
 	"scss-bem-gen/internal/generator"
 )
@@ -37,6 +38,10 @@ Flags:
   -indent N|tab       indentation: number of spaces, or "tab" (default: 2)
   -nesting dom|bem    dom: nest by JSX tree (default)
                       bem: nest by class name, one rule per block
+  -naming PRESET      class naming convention (default: classic)
+                      classic  block__elem--mod
+                      kv       block__elem--key_value
+                      react    Block-elem_mod_value
   -force              write output even if the input has errors
   -h, -help           show this help
 `
@@ -68,7 +73,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("jsx2scss", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
-	var in, out, indent, nesting string
+	var in, out, indent, nesting, naming string
 	var force bool
 	fs.StringVar(&in, "i", "", "")
 	fs.StringVar(&in, "input", "", "")
@@ -76,6 +81,7 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs.StringVar(&out, "output", "", "")
 	fs.StringVar(&indent, "indent", "2", "")
 	fs.StringVar(&nesting, "nesting", "dom", "")
+	fs.StringVar(&naming, "naming", bem.PresetClassic, "")
 	fs.BoolVar(&force, "force", false, "")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
@@ -101,6 +107,12 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return fmt.Errorf("%w: %v", errUsage, err)
 	}
 	if opts.Nesting, err = generator.ParseNesting(nesting); err != nil {
+		return fmt.Errorf("%w: %v", errUsage, err)
+	}
+	if naming == bem.PresetCustom {
+		return fmt.Errorf("%w: the custom naming preset needs a config file, which the CLI does not read yet", errUsage)
+	}
+	if opts.Naming, err = bem.NewNaming(bem.NamingConfig{Preset: naming}); err != nil {
 		return fmt.Errorf("%w: %v", errUsage, err)
 	}
 

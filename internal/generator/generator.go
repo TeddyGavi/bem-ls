@@ -6,6 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"scss-bem-gen/internal/bem"
 	"scss-bem-gen/internal/core"
 )
 
@@ -47,12 +48,8 @@ func (n Nesting) String() string {
 type Options struct {
 	Indent  string // one level of indentation; default two spaces
 	Nesting Nesting
+	Naming  *bem.Naming // how class names split into parts; default classic
 }
-
-const (
-	elementSep  = "__"
-	modifierSep = "--"
-)
 
 // Generate returns the SCSS skeleton for the tree rooted at root, which is
 // normally the virtual root returned by core.Parser.Root. Only static and
@@ -62,16 +59,20 @@ func Generate(root *core.Node, opts Options) string {
 	if opts.Indent == "" {
 		opts.Indent = "  "
 	}
-	out := newRule("", "")
+	if opts.Naming == nil {
+		opts.Naming = bem.Classic()
+	}
+	c := common{naming: opts.Naming, elemSep: opts.Naming.ElementSep(), out: newRule("", "")}
 	switch opts.Nesting {
 	case NestingBEM:
-		g := &bemGen{out: out, byName: map[string]*rule{}, used: map[string]bool{}}
+		g := &bemGen{common: c, byName: map[string]*rule{}, used: map[string]bool{}}
 		g.collect(root)
 		g.walk(root)
 	default:
-		g := &domGen{out: out}
+		g := &domGen{common: c}
 		g.walk(root, nil)
 	}
+	out := c.out
 	var b strings.Builder
 	for i, r := range out.ordered() {
 		if i > 0 {
@@ -88,6 +89,7 @@ func Generate(root *core.Node, opts Options) string {
 type rule struct {
 	sel      string // as written: ".card", "&__title", "&--active", "img"
 	class    string // full class it matches, without modifier; "" for tags
+	isMod    bool
 	children []*rule
 	index    map[string]*rule
 }
@@ -108,9 +110,10 @@ func (r *rule) child(sel, class string) *rule {
 	return c
 }
 
+// addModifiers adds &--m rules; mods are suffixes such as "--m".
 func (r *rule) addModifiers(base string, mods []string) {
 	for _, m := range mods {
-		r.child("&"+modifierSep+m, base+modifierSep+m)
+		r.child("&"+m, base+m).isMod = true
 	}
 }
 
@@ -119,12 +122,12 @@ func (r *rule) addModifiers(base string, mods []string) {
 func (r *rule) ordered() []*rule {
 	out := make([]*rule, 0, len(r.children))
 	for _, c := range r.children {
-		if strings.HasPrefix(c.sel, "&"+modifierSep) {
+		if c.isMod {
 			out = append(out, c)
 		}
 	}
 	for _, c := range r.children {
-		if !strings.HasPrefix(c.sel, "&"+modifierSep) {
+		if !c.isMod {
 			out = append(out, c)
 		}
 	}
@@ -148,26 +151,25 @@ func (r *rule) write(b *strings.Builder, indent string, depth int) {
 }
 
 // ---------------------------------------------------------------------------
-// Class helpers (classic BEM: block__elem--mod)
+// Class helpers
 
-// base is a class without its modifier, plus the modifiers used with it on
-// one element.
-type base struct {
-	name string
-	mods []string
+// common is shared by both nesting modes.
+type common struct {
+	naming  *bem.Naming
+	elemSep string
+	out     *rule
 }
 
-// splitClass splits "b__e--m" into "b__e" and "m".
-func splitClass(c string) (name, mod string) {
-	if i := strings.Index(c, modifierSep); i > 0 {
-		return c[:i], c[i+len(modifierSep):]
-	}
-	return c, ""
+// base is a class without its modifier, plus the modifier suffixes used
+// with it on one element.
+type base struct {
+	name string
+	mods []string // e.g. "--big"
 }
 
 // basesOf groups an element's usable classes by base, in order. Both
-// "card card--big" and a lone "card--big" give {card [big]}.
-func basesOf(n *core.Node) []base {
+// "card card--big" and a lone "card--big" give {card [--big]}.
+func (g *common) basesOf(n *core.Node) []base {
 	var out []base
 	for _, c := range n.Classes {
 		if c.Kind != core.ClassStatic && c.Kind != core.ClassConditional {
@@ -176,7 +178,11 @@ func basesOf(n *core.Node) []base {
 		if !validIdent(c.Name) {
 			continue
 		}
-		name, mod := splitClass(c.Name)
+		parsed := g.naming.Parse(c.Name)
+		name, mod := parsed.Base(), parsed.ModSuffix()
+		if name == "" {
+			continue
+		}
 		i := 0
 		for i < len(out) && out[i].name != name {
 			i++
@@ -210,11 +216,9 @@ func validIdent(s string) bool {
 	return true
 }
 
-func hasUsableClasses(n *core.Node) bool { return len(basesOf(n)) > 0 }
-
-func hasClassedDescendant(n *core.Node) bool {
+func (g *common) hasClassedDescendant(n *core.Node) bool {
 	for _, c := range n.Children {
-		if hasUsableClasses(c) || hasClassedDescendant(c) {
+		if len(g.basesOf(c)) > 0 || g.hasClassedDescendant(c) {
 			return true
 		}
 	}
@@ -233,7 +237,7 @@ func contains(list []string, s string) bool {
 // ---------------------------------------------------------------------------
 // DOM nesting
 
-type domGen struct{ out *rule }
+type domGen struct{ common }
 
 // level holds the rules created for one classed ancestor element.
 type level []*rule
@@ -246,7 +250,7 @@ func (g *domGen) container(chain []level) *rule {
 }
 
 func (g *domGen) walk(n *core.Node, chain []level) {
-	bases := basesOf(n)
+	bases := g.basesOf(n)
 	switch {
 	case len(bases) > 0:
 		var lv level
@@ -256,7 +260,7 @@ func (g *domGen) walk(n *core.Node, chain []level) {
 			lv = append(lv, r)
 		}
 		chain = append(chain, lv)
-	case n.IsRoot() || n.IsFragment() || n.IsComponent() || len(n.Classes) > 0 || hasClassedDescendant(n):
+	case n.IsRoot() || n.IsFragment() || n.IsComponent() || len(n.Classes) > 0 || g.hasClassedDescendant(n):
 		// Transparent: children are placed as if they were ours. Elements
 		// with only module or dynamic classes are styled elsewhere.
 	default:
@@ -281,13 +285,13 @@ func (g *domGen) place(name string, chain []level) *rule {
 			if r.class == name {
 				return r
 			}
-			if strings.HasPrefix(name, r.class+elementSep) {
+			if strings.HasPrefix(name, r.class+g.elemSep) {
 				return r.child("&"+name[len(r.class):], name)
 			}
 		}
 	}
 	c := g.container(chain)
-	if block, _, ok := strings.Cut(name, elementSep); ok && block != "" && c == g.out {
+	if block, _, ok := strings.Cut(name, g.elemSep); ok && block != "" && c == g.out {
 		return g.out.child("."+block, block).child("&"+name[len(block):], name)
 	}
 	return c.child("."+name, name)
@@ -297,13 +301,13 @@ func (g *domGen) place(name string, chain []level) *rule {
 // BEM nesting
 
 type bemGen struct {
-	out    *rule
+	common
 	byName map[string]*rule
 	used   map[string]bool
 }
 
 func (g *bemGen) collect(n *core.Node) {
-	for _, b := range basesOf(n) {
+	for _, b := range g.basesOf(n) {
 		g.used[b.name] = true
 	}
 	for _, c := range n.Children {
@@ -312,7 +316,7 @@ func (g *bemGen) collect(n *core.Node) {
 }
 
 func (g *bemGen) walk(n *core.Node) {
-	for _, b := range basesOf(n) {
+	for _, b := range g.basesOf(n) {
 		g.place(b.name).addModifiers(b.name, b.mods)
 	}
 	for _, c := range n.Children {
@@ -327,13 +331,13 @@ func (g *bemGen) place(name string) *rule {
 		return r
 	}
 	var r *rule
-	block, _, isElem := strings.Cut(name, elementSep)
+	block, _, isElem := strings.Cut(name, g.elemSep)
 	if !isElem || block == "" {
 		r = g.out.child("."+name, name)
 	} else {
 		parent := block
-		for i := len(name) - len(elementSep); i > len(block); i-- {
-			if strings.HasPrefix(name[i:], elementSep) && g.used[name[:i]] {
+		for i := len(name) - len(g.elemSep); i > len(block); i-- {
+			if strings.HasPrefix(name[i:], g.elemSep) && g.used[name[:i]] {
 				parent = name[:i]
 				break
 			}
