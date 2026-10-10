@@ -407,3 +407,6 @@ func sortDiagnostics(d []Diagnostic) {
 		return d[i].Range.Start.Offset < d[j].Range.Start.Offset
 	})
 }
+
+// Ignored reports whether class matches one of the Ignore patterns.
+func (l *Linter) Ignored(class string) bool { return l.ignored(class) }

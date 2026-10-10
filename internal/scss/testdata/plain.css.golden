@@ -1,0 +1,35 @@
+# imports
+3:14 @import "reset.css" ns="" prefix="" show=[] hide=[]
+# tree
+4:1 @font-face "" -> [] {4:12..4:83}
+  4:14 decl "font-family": "X"
+  4:30 decl "src": "url(//cdn.example.com/x.woff2) format(\"woff2\")"
+5:1 rule ".btn, .btn-group > .btn" -> [".btn" ".btn-group > .btn"] {5:25..5:57}
+  5:27 decl "color": "var(--btn-color, red)"
+6:1 rule ".btn:not(.btn--disabled):hover" -> [".btn:not(.btn--disabled):hover"] {6:32..6:47}
+  6:34 decl "color": "blue"
+7:1 rule "a[href$=\".pdf\"]::after" -> ["a[href$=\".pdf\"]::after"] {7:24..7:49}
+  7:26 decl "content": "\"\\2193 .pdf\""
+8:1 @media "screen and (max-width: 600px)" -> [] {8:38..8:64}
+  8:40 rule ".btn" -> [".btn"] {8:45..8:62}
+    8:47 decl "display": "block"
+9:1 @supports "(display: grid)" -> [] {9:27..9:54}
+  9:29 rule ".grid" -> [".grid"] {9:35..9:52}
+    9:37 decl "display": "grid"
+10:1 rule "#main.layout .col-1\\/2" -> ["#main.layout .col-1\\/2"] {10:24..10:38}
+  10:26 decl "width": "50%"
+# classes
+5:1 btn from ".btn"
+5:7 btn-group from ".btn-group"
+5:20 btn from ".btn"
+6:1 btn from ".btn"
+6:10 btn--disabled from ".btn--disabled"
+8:40 btn from ".btn"
+9:29 grid from ".grid"
+10:6 layout from ".layout"
+10:14 col-1\/2 from ".col-1\\/2"
+# symbols
+# refs
+4:66 function "format"
+5:38 custom property "--btn-color"
+# errors

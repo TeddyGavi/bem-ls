@@ -1,0 +1,10 @@
+/* Plain CSS: no nesting, // is not used. */
+@charset "utf-8";
+@import url("reset.css");
+@font-face { font-family: X; src: url(//cdn.example.com/x.woff2) format("woff2"); }
+.btn, .btn-group > .btn { color: var(--btn-color, red); }
+.btn:not(.btn--disabled):hover { color: blue; }
+a[href$=".pdf"]::after { content: "\2193 .pdf"; }
+@media screen and (max-width: 600px) { .btn { display: block } }
+@supports (display: grid) { .grid { display: grid; } }
+#main.layout .col-1\/2 { width: 50%; }

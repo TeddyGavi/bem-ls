@@ -9,8 +9,13 @@
 // when there is none or it is "-". It writes SCSS to standard output, or to
 // the file given by -o. Problems are reported on standard error.
 //
-// Exit status: 0 on success, 1 if the input has errors or I/O failed, 2 for
-// bad usage.
+// Settings (naming convention, indentation, nesting, ignore patterns) are
+// read from bem.config.json: the file given by -config, or the first one
+// found from the input file's directory upwards, up to the project root
+// (a directory containing .git). Command-line flags override it.
+//
+// Exit status: 0 on success, 1 if the input or configuration has errors or
+// I/O failed, 2 for bad usage.
 package main
 
 import (
@@ -19,10 +24,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"scss-bem-gen/internal/bem"
+	"scss-bem-gen/internal/config"
 	"scss-bem-gen/internal/core"
 	"scss-bem-gen/internal/generator"
 )
@@ -42,6 +49,9 @@ Flags:
                       classic  block__elem--mod
                       kv       block__elem--key_value
                       react    Block-elem_mod_value
+                      custom   separators and patterns from the config
+  -config FILE        read settings from FILE (default: nearest bem.config.json)
+  -no-config          don't look for bem.config.json
   -force              write output even if the input has errors
   -h, -help           show this help
 `
@@ -73,8 +83,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("jsx2scss", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
-	var in, out, indent, nesting, naming string
-	var force bool
+	var in, out, indent, nesting, naming, configPath string
+	var force, noConfig bool
 	fs.StringVar(&in, "i", "", "")
 	fs.StringVar(&in, "input", "", "")
 	fs.StringVar(&out, "o", "", "")
@@ -82,6 +92,8 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs.StringVar(&indent, "indent", "2", "")
 	fs.StringVar(&nesting, "nesting", "dom", "")
 	fs.StringVar(&naming, "naming", bem.PresetClassic, "")
+	fs.StringVar(&configPath, "config", "", "")
+	fs.BoolVar(&noConfig, "no-config", false, "")
 	fs.BoolVar(&force, "force", false, "")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
@@ -101,19 +113,39 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return fmt.Errorf("%w: too many arguments", errUsage)
 	}
 
-	opts := generator.Options{}
-	var err error
-	if opts.Indent, err = parseIndent(indent); err != nil {
-		return fmt.Errorf("%w: %v", errUsage, err)
+	set := map[string]bool{}
+	fs.Visit(func(f *flag.Flag) { set[f.Name] = true })
+	if configPath != "" && noConfig {
+		return fmt.Errorf("%w: -config and -no-config are mutually exclusive", errUsage)
 	}
-	if opts.Nesting, err = generator.ParseNesting(nesting); err != nil {
-		return fmt.Errorf("%w: %v", errUsage, err)
+
+	settings, err := loadSettings(configPath, noConfig, in)
+	if err != nil {
+		return err
 	}
-	if naming == bem.PresetCustom {
-		return fmt.Errorf("%w: the custom naming preset needs a config file, which the CLI does not read yet", errUsage)
+	if set["naming"] {
+		settings.Naming.Preset = naming
 	}
-	if opts.Naming, err = bem.NewNaming(bem.NamingConfig{Preset: naming}); err != nil {
-		return fmt.Errorf("%w: %v", errUsage, err)
+	namingConv, err := settings.NamingConvention()
+	if err != nil {
+		if set["naming"] {
+			return fmt.Errorf("%w: %v", errUsage, err)
+		}
+		return fmt.Errorf("config: %v", err)
+	}
+	opts, err := settings.GeneratorOptions(namingConv)
+	if err != nil {
+		return fmt.Errorf("config: %v", err)
+	}
+	if set["indent"] {
+		if opts.Indent, err = parseIndent(indent); err != nil {
+			return fmt.Errorf("%w: %v", errUsage, err)
+		}
+	}
+	if set["nesting"] {
+		if opts.Nesting, err = generator.ParseNesting(nesting); err != nil {
+			return fmt.Errorf("%w: %v", errUsage, err)
+		}
 	}
 
 	name, src, err := readInput(in, stdin)
@@ -138,6 +170,27 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return err
 	}
 	return os.WriteFile(out, []byte(result), 0o644)
+}
+
+// loadSettings reads the configuration file: explicit, found near the
+// input, or none.
+func loadSettings(explicit string, disabled bool, input string) (config.Settings, error) {
+	path := explicit
+	if path == "" && !disabled {
+		dir := "."
+		if input != "" && input != "-" {
+			dir = filepath.Dir(input)
+		}
+		path = config.Find(dir)
+	}
+	if path == "" {
+		return config.Settings{}, nil
+	}
+	raw, err := config.LoadFile(path)
+	if err != nil {
+		return config.Settings{}, err
+	}
+	return config.Parse(raw, true)
 }
 
 func readInput(path string, stdin io.Reader) (name string, src []byte, err error) {

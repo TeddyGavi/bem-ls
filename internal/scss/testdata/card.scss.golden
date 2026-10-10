@@ -1,0 +1,91 @@
+# imports
+1:7 @use "sass:math" ns="math" prefix="" show=[] hide=[]
+2:7 @use "./tokens" ns="t" prefix="" show=[] hide=[]
+3:11 @forward "src/list" ns="" prefix="list-" show=[] hide=["list-reset" "$gap"]
+4:10 @import "legacy/mixins" ns="" prefix="" show=[] hide=[]
+4:27 @import "legacy/vars" ns="" prefix="" show=[] hide=[]
+# tree
+10:1 rule ":root" -> [":root"] {10:7..12:1}
+  11:3 decl "--gap": "8px"
+14:1 rule "%reset" -> ["%reset"] {14:8..14:33}
+  14:10 decl "margin": "0"
+  14:21 decl "padding": "0"
+17:1 @mixin "theme($bg: $primary, $fg: white)" -> [] {17:41..21:1}
+  18:3 decl "color": "$fg"
+  19:3 decl "background": "$bg"
+23:1 @function "rem($px)" -> [] {23:20..25:1}
+27:1 rule ".card" -> [".card"] {27:7..64:1}
+  29:3 decl "border-radius": "$radius"
+  30:3 decl "color": "t.$text"
+  31:3 decl "margin": "rem(10px) var(--gap)"
+  33:3 rule "&__title" -> [".card__title"] {33:12..38:3}
+    35:5 decl "font-weight": "bold"
+    37:5 rule "&--big" -> [".card__title--big"] {37:12..37:30}
+      37:14 decl "font-size": "2em"
+  40:3 rule "&__body, &__footer" -> [".card__body" ".card__footer"] {40:22..42:3}
+    41:5 decl "padding": "$inner"
+  44:3 rule "&:hover,\n  &.is-active" -> [".card:hover" ".card.is-active"] {45:15..45:37}
+    45:17 decl "outline": "1px solid"
+  47:3 rule ".theme-dark &" -> [".theme-dark .card"] {47:17..47:33}
+    47:19 decl "color": "white"
+  49:3 @media "(min-width: t.$bp)" -> [".card"] {49:29..51:3}
+    50:5 rule "&__aside" -> [".card__aside"] {50:14..50:32}
+      50:16 decl "display": "block"
+  53:3 @include "t.elevate(2) using ($level)" -> [".card"] {53:40..55:3}
+    54:5 decl "z-index": "$level"
+  57:3 rule ".card-list" -> [".card-list"] {57:23..57:40}
+    57:25 decl "display": "grid"
+  59:3 rule "&--#{$variant}" -> [".card--#{$variant}"] {59:18..59:20}
+  61:3 @each "$name, $icon in t.$icons" -> [".card"] {61:34..63:3}
+    62:5 rule ".icon-#{$name}::before" -> [".card .icon-#{$name}::before"] {62:28..62:46}
+      62:30 decl "content": "$icon"
+66:1 @keyframes "card-in" -> [] {66:20..69:1}
+  67:3 rule "from" -> [] {67:8..67:22}
+    67:10 decl "opacity": "0"
+  68:3 rule "to" -> [] {68:6..68:20}
+    68:8 decl "opacity": "1"
+# classes
+27:1 card from ".card"
+33:3 card__title from "&__title"
+37:5 card__title--big from "&--big"
+40:3 card__body from "&__body"
+40:12 card__footer from "&__footer"
+45:4 is-active from ".is-active"
+47:3 theme-dark from ".theme-dark"
+50:5 card__aside from "&__aside"
+57:12 card-list from ".card-list"
+# symbols
+7:1 variable $primary global value="#333" params="" default=true param=false doc="Primary brand colour."
+8:1 variable $radius global value="4px" params="" default=false param=false doc=""
+11:3 custom property --gap global value="8px" params="" default=false param=false doc=""
+14:1 placeholder %reset global value="" params="" default=false param=false doc=""
+17:8 mixin theme global value="" params="$bg: $primary, $fg: white" default=false param=false doc="Theme a block."
+17:14 variable $bg in mixin theme($bg: $primary, $fg: white) value="$primary" params="" default=false param=true doc=""
+17:29 variable $fg in mixin theme($bg: $primary, $fg: white) value="white" params="" default=false param=true doc=""
+23:11 function rem global value="" params="$px" default=false param=false doc=""
+23:15 variable $px in function rem($px) value="" params="" default=false param=true doc=""
+28:3 variable $inner in .card value="2px" params="" default=false param=false doc=""
+53:32 variable $level in include t.elevate(2) using ($level) value="" params="" default=false param=true doc=""
+61:9 variable $name in each $name, $icon in t.$icons value="" params="" default=false param=true doc=""
+61:16 variable $icon in each $name, $icon in t.$icons value="" params="" default=false param=true doc=""
+66:12 keyframes card-in global value="" params="" default=false param=false doc=""
+# refs
+17:19 variable "$primary" -> 7:1
+18:10 variable "$fg" -> 17:29
+19:15 variable "$bg" -> 17:14
+24:11 function "math.div"
+24:20 variable "$px" -> 23:15
+29:18 variable "$radius" -> 8:1
+30:10 variable "t.$text"
+31:11 function "rem" -> 23:11
+31:25 custom property "--gap" -> 11:3
+34:13 placeholder "%reset" -> 14:1
+41:14 variable "$inner" -> 28:3
+49:22 variable "t.$bp"
+53:12 mixin "t.elevate"
+54:14 variable "$level" -> 53:32
+59:8 variable "$variant"
+61:25 variable "t.$icons"
+62:13 variable "$name" -> 61:9
+62:39 variable "$icon" -> 61:16
+# errors

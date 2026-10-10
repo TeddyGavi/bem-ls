@@ -1,0 +1,58 @@
+*bem-ls.txt*  BEM language server client                        *bem-ls*
+
+Requires Neovim 0.12 or later and the `bem-ls` binary.
+
+==============================================================================
+SETUP                                                       *bem-ls-setup*
+
+>lua
+    require('bem-ls').setup({
+      cmd = { 'bem-ls' },
+      settings = { naming = { preset = 'classic' } },
+      ghost_text = true,
+      accept_key = '<Tab>',
+    })
+<
+Options:
+  cmd         Server command. Default `{ 'bem-ls' }`.
+  filetypes   Filetypes to attach to. Default: typescriptreact,
+              javascriptreact, typescript, javascript, scss, css, sass.
+  settings    Server settings (the "bem" section). A `bem.config.json` at
+              the project root overrides them.
+  ghost_text  Show missing selectors as ghost text in stylesheets.
+              Default true.
+  accept_key  Insert-mode key that accepts ghost text, falling back to the
+              key itself. Default `<Tab>`; `false` for no mapping.
+  on_attach   `function(client, bufnr)` called when the server attaches.
+
+Without setup(), `vim.lsp.enable('bem_ls')` uses `lsp/bem_ls.lua`.
+
+==============================================================================
+COMMANDS                                                 *bem-ls-commands*
+
+:BemSkeleton                                                *:BemSkeleton*
+    Show the SCSS skeleton of the component in the current buffer in a
+    scratch buffer.
+
+==============================================================================
+FUNCTIONS                                               *bem-ls-functions*
+
+require('bem-ls').client({bufnr})                        *bem-ls.client()*
+    The bem-ls client attached to {bufnr}, or nil.
+
+require('bem-ls').skeleton({bufnr})                    *bem-ls.skeleton()*
+    Like |:BemSkeleton|.
+
+==============================================================================
+GHOST TEXT                                             *bem-ls-ghost-text*
+
+In a stylesheet paired with a component, on a blank line:
+  - inside a rule, the rule's missing elements and modifiers appear;
+  - at the top level, missing blocks appear;
+  - in an empty file, the whole skeleton appears.
+Press the accept key (default <Tab>). The code action "Insert missing BEM
+selectors" makes the same change for the whole file.
+
+Health check: `:checkhealth bem-ls`
+
+ vim:tw=78:ts=8:ft=help:norl:

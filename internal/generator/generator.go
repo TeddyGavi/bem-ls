@@ -49,6 +49,9 @@ type Options struct {
 	Indent  string // one level of indentation; default two spaces
 	Nesting Nesting
 	Naming  *bem.Naming // how class names split into parts; default classic
+	// Skip, if set, leaves out classes it returns true for (e.g. the
+	// configured ignore patterns).
+	Skip func(class string) bool
 }
 
 // Generate returns the SCSS skeleton for the tree rooted at root, which is
@@ -62,7 +65,7 @@ func Generate(root *core.Node, opts Options) string {
 	if opts.Naming == nil {
 		opts.Naming = bem.Classic()
 	}
-	c := common{naming: opts.Naming, elemSep: opts.Naming.ElementSep(), out: newRule("", "")}
+	c := common{naming: opts.Naming, elemSep: opts.Naming.ElementSep(), skip: opts.Skip, out: newRule("", "")}
 	switch opts.Nesting {
 	case NestingBEM:
 		g := &bemGen{common: c, byName: map[string]*rule{}, used: map[string]bool{}}
@@ -157,6 +160,7 @@ func (r *rule) write(b *strings.Builder, indent string, depth int) {
 type common struct {
 	naming  *bem.Naming
 	elemSep string
+	skip    func(string) bool
 	out     *rule
 }
 
@@ -175,7 +179,7 @@ func (g *common) basesOf(n *core.Node) []base {
 		if c.Kind != core.ClassStatic && c.Kind != core.ClassConditional {
 			continue
 		}
-		if !validIdent(c.Name) {
+		if !validIdent(c.Name) || (g.skip != nil && g.skip(c.Name)) {
 			continue
 		}
 		parsed := g.naming.Parse(c.Name)
@@ -197,8 +201,10 @@ func (g *common) basesOf(n *core.Node) []base {
 	return out
 }
 
-// validIdent reports whether s can be written as a class selector without
+// ValidIdent reports whether s can be written as a class selector without
 // escaping. Utility classes like "w-1/2" or "hover:x" are skipped.
+func ValidIdent(s string) bool { return validIdent(s) }
+
 func validIdent(s string) bool {
 	t := strings.TrimPrefix(s, "-")
 	if t == "" {

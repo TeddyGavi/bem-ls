@@ -1,0 +1,346 @@
+{
+  "name": "bem-ls",
+  "displayName": "BEM for JSX & SCSS",
+  "description": "BEM class checks, completion, navigation and SCSS ghost text for React components and their stylesheets.",
+  "version": "0.1.0",
+  "publisher": "teddygavi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TeddyGavi/scss-bem-gen"
+  },
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "bem",
+    "scss",
+    "css modules",
+    "styled-components",
+    "react"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:scss",
+    "onLanguage:css",
+    "onLanguage:sass",
+    "workspaceContains:**/bem.config.json"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "bem.showSkeleton",
+        "title": "Generate SCSS skeleton",
+        "category": "BEM"
+      },
+      {
+        "command": "bem.restartServer",
+        "title": "Restart server",
+        "category": "BEM"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "bem.showSkeleton",
+          "when": "editorLangId =~ /^(typescriptreact|javascriptreact|typescript|javascript)$/"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "bem.config.json",
+        "url": "./schemas/bem.config.schema.json"
+      }
+    ],
+    "configuration": {
+      "title": "BEM",
+      "properties": {
+        "bem.naming.preset": {
+          "enum": [
+            "classic",
+            "kv",
+            "react",
+            "custom"
+          ],
+          "default": "classic",
+          "markdownDescription": "classic: block__elem--mod. kv: block__elem--key_value. react: Block-elem_mod_value. custom: your own separators and patterns."
+        },
+        "bem.naming.elementSeparator": {
+          "type": "string",
+          "markdownDescription": "Separator before an element (classic: \"__\")."
+        },
+        "bem.naming.modifierSeparator": {
+          "type": "string",
+          "markdownDescription": "Separator before a modifier (classic: \"--\")."
+        },
+        "bem.naming.valueSeparator": {
+          "type": "string",
+          "markdownDescription": "Separator before a modifier value (kv: \"_\"). Empty disables values."
+        },
+        "bem.naming.block": {
+          "type": "string",
+          "markdownDescription": "Regular expression a block name must match (anchors are added)."
+        },
+        "bem.naming.element": {
+          "type": "string",
+          "markdownDescription": "Regular expression an element name must match."
+        },
+        "bem.naming.modifier": {
+          "type": "string",
+          "markdownDescription": "Regular expression a modifier name must match."
+        },
+        "bem.naming.value": {
+          "type": "string",
+          "markdownDescription": "Regular expression a modifier value must match."
+        },
+        "bem.rules": {
+          "type": "object",
+          "properties": {
+            "invalidName": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "A class doesn't follow the naming convention. Default: warning."
+            },
+            "nestedElement": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "An element of an element, like b__e1__e2. Default: info."
+            },
+            "modifierWithoutBase": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "b--m on an element without b. Default: warning."
+            },
+            "elementOutsideBlock": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "b__e with no ancestor using block b. Default: warning."
+            },
+            "multipleBlocksMix": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "One element carries two different blocks. Default: info."
+            },
+            "missingInStylesheet": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "A class has no selector in the component's stylesheet. Default: warning."
+            },
+            "unusedSelector": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "A stylesheet class no component uses (shown faded). Default: hint."
+            },
+            "moduleClassMissing": {
+              "enum": [
+                "off",
+                "hint",
+                "info",
+                "warning",
+                "error"
+              ],
+              "markdownDescription": "styles.x where the CSS module has no .x. Default: error."
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Severity of each check."
+        },
+        "bem.ignore": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Regular expressions; matching classes are skipped by every rule and by skeleton generation, e.g. \"^js-\"."
+        },
+        "bem.stylesheet.lookup": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "import",
+              "sibling",
+              "directory",
+              "parent"
+            ]
+          },
+          "markdownDescription": "Strategies, in order: an imported stylesheet, a sibling with the same name, another stylesheet in the directory, parent directories. Default: `[\"import\",\"sibling\",\"directory\",\"parent\"]`."
+        },
+        "bem.stylesheet.extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\."
+          },
+          "markdownDescription": "Stylesheet suffixes tried, in order, for sibling and parent lookups. Default: `[\".module.scss\",\".scss\",\".module.css\",\".css\",\".module.sass\",\".sass\"]`."
+        },
+        "bem.stylesheet.maxSearchDepth": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "How many parent directories the parent lookup searches. Default: `2`."
+        },
+        "bem.stylesheet.loadPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Directories (relative to the root) Sass also searches for @use/@import."
+        },
+        "bem.stylesheet.aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "markdownDescription": "Import prefixes mapped to root-relative directories, e.g. {\"@/\": \"src/\"}."
+        },
+        "bem.stylesheet.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Directory names skipped when indexing the workspace. Default: `[\"node_modules\",\".git\",\"dist\",\"build\",\"out\",\"coverage\",\".next\",\".turbo\",\"vendor\"]`."
+        },
+        "bem.stylesheet.globalFallback": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Resolve variables, mixins and functions that aren't reachable through @use/@import to a global definition anywhere in the workspace (for injected partials)."
+        },
+        "bem.generator.indent": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "Spaces per level, or \"tab\". Default: `2`."
+        },
+        "bem.generator.nesting": {
+          "enum": [
+            "dom",
+            "bem"
+          ],
+          "default": "dom",
+          "markdownDescription": "dom: nest by the JSX tree. bem: one rule per block, nested by class name."
+        },
+        "bem.jsx.classAttributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Attributes holding class names. Default: `[\"className\",\"class\"]`."
+        },
+        "bem.jsx.classFunctions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Helpers whose arguments are class names. Default: `[\"clsx\",\"classnames\",\"classNames\",\"cx\",\"cn\",\"twMerge\",\"twJoin\"]`."
+        },
+        "bem.cssModules.identifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Identifiers treated as CSS modules even without an import. Names bound by a stylesheet import are detected automatically. Default: `[\"styles\",\"classes\"]`."
+        },
+        "bem.styledComponents.identifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "styled-components factories, as in styled.div``. Default: `[\"styled\"]`."
+        },
+        "bem.ghostText.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Suggest missing BEM selectors as ghost text in stylesheets."
+        },
+        "bem.misc.diagnosticsDelay": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "Milliseconds to wait after a change before checking. Default: `200`."
+        },
+        "bem.misc.scanOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Index the workspace in the background at startup."
+        },
+        "bem.server.path": {
+          "type": "string",
+          "markdownDescription": "Path to the `bem-ls` binary. Empty: the bundled binary, then `bem-ls` on the `PATH`.",
+          "scope": "machine-overridable"
+        },
+        "bem.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "markdownDescription": "Log the messages exchanged with the server to the BEM output channel."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "sync-settings": "node scripts/sync-settings.mjs",
+    "copy-schema": "node -e \"require('fs').copyFileSync('../../schema/bem.config.schema.json','schemas/bem.config.schema.json')\"",
+    "build": "npm run copy-schema && node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "tsc -p tsconfig.test.json && node --test \"out/test/**/*.test.js\"",
+    "dev-binary": "cd ../.. && go build -o editors/vscode/bin/bem-ls ./cmd/bem-ls",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^10.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "~1.91.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.4.0"
+  }
+}

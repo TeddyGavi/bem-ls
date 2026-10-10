@@ -1,0 +1,19 @@
+# imports
+# tree
+1:1 rule ".a" -> [".a"] {1:4..4:1}
+  2:3 rule "color: red\n  .b" -> [".a color: red .b"] {3:6..3:14}
+    3:8 decl "x": "y"
+6:1 rule ".c" -> [".c"] {6:4..0:0}
+  6:6 rule "content: \"unterminated\n.d" -> [".c content: \"unterminated .d"] {7:4..8:1}
+# classes
+1:1 a from ".a"
+3:3 b from ".b"
+6:1 c from ".c"
+7:1 d from ".d"
+# symbols
+# refs
+# errors
+5:1: unexpected '}'
+6:15: unterminated string
+7:4: unclosed block
+6:4: unclosed block

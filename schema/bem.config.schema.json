@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/TeddyGavi/scss-bem-gen/schema/bem.config.schema.json",
+  "title": "bem-ls configuration",
+  "description": "Configuration for the BEM language server and jsx2scss. Values here override editor settings.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "naming": {
+      "description": "How class names are split into block, element, modifier and value.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "description": "classic: block__elem--mod. kv: block__elem--key_value. react: Block-elem_mod_value. custom: your own separators and patterns.",
+          "enum": ["classic", "kv", "react", "custom"],
+          "default": "classic"
+        },
+        "elementSeparator": { "description": "Separator before an element (classic: \"__\").", "type": "string", "minLength": 1 },
+        "modifierSeparator": { "description": "Separator before a modifier (classic: \"--\").", "type": "string", "minLength": 1 },
+        "valueSeparator": { "description": "Separator before a modifier value (kv: \"_\"). Empty disables values.", "type": "string" },
+        "block": { "description": "Regular expression a block name must match (anchors are added).", "type": "string" },
+        "element": { "description": "Regular expression an element name must match.", "type": "string" },
+        "modifier": { "description": "Regular expression a modifier name must match.", "type": "string" },
+        "value": { "description": "Regular expression a modifier value must match.", "type": "string" }
+      }
+    },
+    "rules": {
+      "description": "Severity of each check.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "invalidName": { "$ref": "#/definitions/severity", "description": "A class doesn't follow the naming convention. Default: warning." },
+        "nestedElement": { "$ref": "#/definitions/severity", "description": "An element of an element, like b__e1__e2. Default: info." },
+        "modifierWithoutBase": { "$ref": "#/definitions/severity", "description": "b--m on an element without b. Default: warning." },
+        "elementOutsideBlock": { "$ref": "#/definitions/severity", "description": "b__e with no ancestor using block b. Default: warning." },
+        "multipleBlocksMix": { "$ref": "#/definitions/severity", "description": "One element carries two different blocks. Default: info." },
+        "missingInStylesheet": { "$ref": "#/definitions/severity", "description": "A class has no selector in the component's stylesheet. Default: warning." },
+        "unusedSelector": { "$ref": "#/definitions/severity", "description": "A stylesheet class no component uses (shown faded). Default: hint." },
+        "moduleClassMissing": { "$ref": "#/definitions/severity", "description": "styles.x where the CSS module has no .x. Default: error." }
+      }
+    },
+    "ignore": {
+      "description": "Regular expressions; matching classes are skipped by every rule and by skeleton generation, e.g. \"^js-\".",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "stylesheet": {
+      "description": "How components find their stylesheets and how Sass URLs resolve.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lookup": {
+          "description": "Strategies, in order: an imported stylesheet, a sibling with the same name, another stylesheet in the directory, parent directories.",
+          "type": "array",
+          "items": { "enum": ["import", "sibling", "directory", "parent"] },
+          "uniqueItems": true,
+          "default": ["import", "sibling", "directory", "parent"]
+        },
+        "extensions": {
+          "description": "Stylesheet suffixes tried, in order, for sibling and parent lookups.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\." },
+          "default": [".module.scss", ".scss", ".module.css", ".css", ".module.sass", ".sass"]
+        },
+        "maxSearchDepth": { "description": "How many parent directories the parent lookup searches.", "type": "integer", "minimum": 0, "default": 2 },
+        "loadPaths": { "description": "Directories (relative to the root) Sass also searches for @use/@import.", "type": "array", "items": { "type": "string" } },
+        "aliases": {
+          "description": "Import prefixes mapped to root-relative directories, e.g. {\"@/\": \"src/\"}.",
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "exclude": {
+          "description": "Directory names skipped when indexing the workspace.",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["node_modules", ".git", "dist", "build", "out", "coverage", ".next", ".turbo", "vendor"]
+        },
+        "globalFallback": {
+          "description": "Resolve variables, mixins and functions that aren't reachable through @use/@import to a global definition anywhere in the workspace (for injected partials).",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "generator": {
+      "description": "The generated SCSS skeleton.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "indent": {
+          "description": "Spaces per level, or \"tab\".",
+          "oneOf": [
+            { "type": "integer", "minimum": 1, "maximum": 16 },
+            { "type": "string", "pattern": "^(tab|[1-9]|1[0-6])$" }
+          ],
+          "default": 2
+        },
+        "nesting": {
+          "description": "dom: nest by the JSX tree. bem: one rule per block, nested by class name.",
+          "enum": ["dom", "bem"],
+          "default": "dom"
+        }
+      }
+    },
+    "jsx": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "classAttributes": { "description": "Attributes holding class names.", "type": "array", "items": { "type": "string" }, "default": ["className", "class"] },
+        "classFunctions": {
+          "description": "Helpers whose arguments are class names.",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["clsx", "classnames", "classNames", "cx", "cn", "twMerge", "twJoin"]
+        }
+      }
+    },
+    "cssModules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identifiers": {
+          "description": "Identifiers treated as CSS modules even without an import. Names bound by a stylesheet import are detected automatically.",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["styles", "classes"]
+        }
+      }
+    },
+    "styledComponents": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identifiers": { "description": "styled-components factories, as in styled.div``.", "type": "array", "items": { "type": "string" }, "default": ["styled"] }
+      }
+    },
+    "ghostText": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "description": "Suggest missing BEM selectors as ghost text in stylesheets.", "type": "boolean", "default": true }
+      }
+    },
+    "misc": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "diagnosticsDelay": { "description": "Milliseconds to wait after a change before checking.", "type": "integer", "minimum": 0, "default": 200 },
+        "scanOnStartup": { "description": "Index the workspace in the background at startup.", "type": "boolean", "default": true }
+      }
+    }
+  },
+  "definitions": {
+    "severity": { "enum": ["off", "hint", "info", "warning", "error"] }
+  }
+}

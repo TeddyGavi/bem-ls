@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"strings"
 	"testing"
 
 	"scss-bem-gen/internal/bem"
@@ -140,5 +141,13 @@ func TestGenerateNamingPresets(t *testing.T) {
 		if got != tt.want {
 			t.Errorf("%s/%v:\ngot:\n%s\nwant:\n%s", tt.preset, tt.nesting, got, tt.want)
 		}
+	}
+}
+
+func TestGenerateSkip(t *testing.T) {
+	skip := func(c string) bool { return strings.HasPrefix(c, "js-") }
+	got := gen(t, `<div className="a js-hook"><i className="js-only"/><b className="a__b"/></div>`, Options{Skip: skip})
+	if want := ".a {\n  &__b {}\n}\n"; got != want { // the skipped <i> has a class, so it gets no tag selector
+		t.Errorf("got %q, want %q", got, want)
 	}
 }

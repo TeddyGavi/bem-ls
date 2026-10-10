@@ -1,0 +1,11 @@
+id = "bem-ls"
+name = "BEM"
+description = "BEM class checks, completion and navigation for React components and their SCSS/CSS stylesheets."
+version = "0.1.0"
+schema_version = 1
+authors = ["TeddyGavi"]
+repository = "https://github.com/TeddyGavi/scss-bem-gen"
+
+[language_servers.bem-ls]
+name = "bem-ls"
+languages = ["TSX", "JavaScript", "TypeScript", "CSS", "SCSS"]

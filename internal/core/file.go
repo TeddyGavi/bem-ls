@@ -17,8 +17,17 @@ type File struct {
 // ParseFile lexes and parses src. The File is returned even when err is not
 // nil, so callers can use partial results.
 func ParseFile(name, src string) (*File, error) {
+	return ParseFileWith(name, src, nil)
+}
+
+// ParseFileWith is ParseFile with a hook that can change the parser's
+// settings (ClassAttrs, ModuleIdents, ...) before parsing.
+func ParseFileWith(name, src string, configure func(*Parser)) (*File, error) {
 	_, tokens := Lex(name, src)
 	p := NewParser(tokens)
+	if configure != nil {
+		configure(p)
+	}
 	err := p.Parse()
 	return p.File(name, src), err
 }

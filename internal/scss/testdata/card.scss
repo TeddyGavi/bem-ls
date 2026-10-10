@@ -1,0 +1,69 @@
+@use "sass:math";
+@use './tokens' as t;
+@forward "src/list" as list-* hide list-reset, $gap;
+@import 'legacy/mixins', "legacy/vars";
+
+/// Primary brand colour.
+$primary: #333 !default;
+$radius: 4px;
+
+:root {
+  --gap: 8px;
+}
+
+%reset { margin: 0; padding: 0; }
+
+/// Theme a block.
+@mixin theme($bg: $primary, $fg: white) {
+  color: $fg;
+  background: $bg;
+  @content;
+}
+
+@function rem($px) {
+  @return math.div($px, 16px) * 1rem;
+}
+
+.card {
+  $inner: 2px;
+  border-radius: $radius;
+  color: t.$text;
+  margin: rem(10px) var(--gap);
+
+  &__title {
+    @extend %reset;
+    font-weight: bold;
+
+    &--big { font-size: 2em; }
+  }
+
+  &__body, &__footer {
+    padding: $inner;
+  }
+
+  &:hover,
+  &.is-active { outline: 1px solid; }
+
+  .theme-dark & { color: white; }
+
+  @media (min-width: t.$bp) {
+    &__aside { display: block; }
+  }
+
+  @include t.elevate(2) using ($level) {
+    z-index: $level;
+  }
+
+  @at-root .card-list { display: grid; }
+
+  &--#{$variant} { }
+
+  @each $name, $icon in t.$icons {
+    .icon-#{$name}::before { content: $icon; }
+  }
+}
+
+@keyframes card-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

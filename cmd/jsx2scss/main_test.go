@@ -104,7 +104,8 @@ func TestErrors(t *testing.T) {
 		{[]string{"-nesting", "tree"}, 2, `unknown nesting "tree"`},
 		{[]string{"-indent", "x"}, 2, `invalid -indent "x"`},
 		{[]string{"-naming", "bootstrap"}, 2, `unknown naming preset "bootstrap"`},
-		{[]string{"-naming", "custom"}, 2, "needs a config file"},
+		{[]string{"-config", "x.json", "-no-config"}, 2, "mutually exclusive"},
+		{[]string{"-config", "/does/not/exist.json"}, 1, "no such file"},
 		{[]string{"-bogus"}, 2, "flag provided but not defined: -bogus"},
 		{[]string{"a.jsx", "b.jsx"}, 2, "too many arguments"},
 		{[]string{"-i", "a.jsx", "b.jsx"}, 2, "both by -i and as an argument"},
@@ -125,5 +126,63 @@ func TestHelp(t *testing.T) {
 	code, out, errOut := runCLI(t, "", "-h")
 	if code != 0 || !strings.HasPrefix(out, "Usage: jsx2scss") || errOut != "" {
 		t.Errorf("exit %d, stdout %q, stderr %q", code, out, errOut)
+	}
+}
+
+// writeProject makes a project with a .git root, a config and a component.
+func writeProject(t *testing.T, cfg string) (root, comp string) {
+	t.Helper()
+	root = t.TempDir()
+	os.MkdirAll(filepath.Join(root, ".git"), 0o755)
+	os.MkdirAll(filepath.Join(root, "src", "ui"), 0o755)
+	if cfg != "" {
+		os.WriteFile(filepath.Join(root, "bem.config.json"), []byte(cfg), 0o644)
+	}
+	comp = filepath.Join(root, "src", "ui", "Card.jsx")
+	os.WriteFile(comp, []byte(`<div className="Card js-hook"><h2 className="Card-title Card-title_big"/></div>`), 0o644)
+	return root, comp
+}
+
+func TestConfigFile(t *testing.T) {
+	_, comp := writeProject(t, `{"naming": {"preset": "react"}, "generator": {"indent": "tab"}, "ignore": ["^js-"]}`)
+	code, out, errOut := runCLI(t, "", comp)
+	if want := ".Card {\n\t&-title {\n\t\t&_big {}\n\t}\n}\n"; code != 0 || out != want {
+		t.Errorf("found config: exit %d, stdout %q, stderr %q; want %q", code, out, errOut, want)
+	}
+
+	// Flags override the file; -no-config ignores it.
+	_, out, _ = runCLI(t, "", "-indent", "4", comp)
+	if !strings.Contains(out, "\n    &-title {") {
+		t.Errorf("-indent override: %q", out)
+	}
+	_, out, _ = runCLI(t, "", "-no-config", comp)
+	if !strings.Contains(out, ".Card-title {") || !strings.Contains(out, ".js-hook {}") {
+		t.Errorf("-no-config: %q", out)
+	}
+}
+
+func TestCustomNamingFromConfig(t *testing.T) {
+	root, comp := writeProject(t, "")
+	cfg := filepath.Join(root, "custom.json")
+	os.WriteFile(cfg, []byte(`{"naming": {"preset": "custom", "elementSeparator": "-", "modifierSeparator": "_"}}`), 0o644)
+	code, out, errOut := runCLI(t, "", "-config", cfg, "-no-config=false", comp)
+	if code != 0 || !strings.Contains(out, ".Card {\n  &-title {\n    &_big {}") {
+		t.Errorf("custom naming: exit %d, %q, %q", code, out, errOut)
+	}
+}
+
+func TestConfigErrors(t *testing.T) {
+	for cfg, want := range map[string]string{
+		`{"naming": {"preset": "kv",}}`:       "bem.config.json: invalid character",
+		`{"namig": {}}`:                       `unknown field "namig"`,
+		`{"naming": {"preset": "bootstrap"}}`: `config: unknown naming preset "bootstrap"`,
+		`{"generator": {"indent": 99}}`:       `config: generator.indent: "99"`,
+		`{"ignore": ["("]}`:                   "config: ignore: bad pattern",
+	} {
+		_, comp := writeProject(t, cfg)
+		code, out, errOut := runCLI(t, "", comp)
+		if code != 1 || out != "" || !strings.Contains(errOut, want) {
+			t.Errorf("%s: exit %d, stdout %q, stderr %q; want %q", cfg, code, out, errOut, want)
+		}
 	}
 }
