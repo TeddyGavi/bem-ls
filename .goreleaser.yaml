@@ -1,0 +1,66 @@
+# Release builds: static binaries for darwin, linux and windows on amd64 and
+# arm64, one archive per binary. Archive names are relied on by the Zed
+# extension: bem-ls_<version>_<os>_<arch>.tar.gz (.zip on Windows).
+#
+# Local dry run (nothing is published): make snapshot
+version: 2
+
+project_name: scss-bem-gen
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: bem-ls
+    main: ./cmd/bem-ls
+    binary: bem-ls
+    env: [CGO_ENABLED=0]
+    flags: [-trimpath]
+    ldflags: ["-s -w -X main.version={{ .Version }}"]
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+  - id: jsx2scss
+    main: ./cmd/jsx2scss
+    binary: jsx2scss
+    env: [CGO_ENABLED=0]
+    flags: [-trimpath]
+    ldflags: ["-s -w -X main.version={{ .Version }}"]
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: bem-ls
+    ids: [bem-ls]
+    name_template: "bem-ls_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, README.md]
+  - id: jsx2scss
+    ids: [jsx2scss]
+    name_template: "jsx2scss_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, README.md]
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  # Tags with a suffix (v1.2.0-rc.1) become pre-releases.
+  prerelease: auto

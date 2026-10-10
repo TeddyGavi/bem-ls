@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -23,6 +24,9 @@ func TestBinaryOverStdio(t *testing.T) {
 	}
 	dir := t.TempDir()
 	bin := filepath.Join(dir, "bem-ls")
+	if runtime.GOOS == "windows" {
+		bin += ".exe"
+	}
 	if out, err := exec.Command("go", "build", "-o", bin, ".").CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, out)
 	}
@@ -70,8 +74,14 @@ func TestBinaryOverStdio(t *testing.T) {
 		}
 		return m
 	}
-	uri := (&url.URL{Scheme: "file", Path: filepath.ToSlash(root)}).String()
-	compURI := (&url.URL{Scheme: "file", Path: filepath.ToSlash(comp)}).String()
+	fileURI := func(p string) string {
+		p = filepath.ToSlash(p)
+		if !strings.HasPrefix(p, "/") {
+			p = "/" + p // C:/x on Windows
+		}
+		return (&url.URL{Scheme: "file", Path: p}).String()
+	}
+	uri, compURI := fileURI(root), fileURI(comp)
 
 	send(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{
 		"rootUri": uri, "capabilities": map[string]any{},

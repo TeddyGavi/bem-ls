@@ -4,6 +4,7 @@
   "description": "BEM class checks, completion, navigation and SCSS ghost text for React components and their stylesheets.",
   "version": "0.1.0",
   "publisher": "teddygavi",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/TeddyGavi/scss-bem-gen"
@@ -324,7 +325,7 @@
   },
   "scripts": {
     "sync-settings": "node scripts/sync-settings.mjs",
-    "copy-schema": "node -e \"require('fs').copyFileSync('../../schema/bem.config.schema.json','schemas/bem.config.schema.json')\"",
+    "copy-schema": "node -e \"const fs=require('fs');fs.mkdirSync('schemas',{recursive:true});fs.copyFileSync('../../schema/bem.config.schema.json','schemas/bem.config.schema.json');fs.copyFileSync('../../LICENSE','LICENSE')\"",
     "build": "npm run copy-schema && node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
     "typecheck": "tsc --noEmit -p .",

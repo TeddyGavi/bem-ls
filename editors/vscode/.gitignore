@@ -4,3 +4,5 @@ out/
 bin/
 schemas/
 *.vsix
+LICENSE
+vsix/

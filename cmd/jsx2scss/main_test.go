@@ -100,12 +100,12 @@ func TestErrors(t *testing.T) {
 		code int
 		msg  string
 	}{
-		{[]string{"-i", "/does/not/exist.jsx"}, 1, "jsx2scss: open /does/not/exist.jsx: no such file or directory"},
+		{[]string{"-i", "/does/not/exist.jsx"}, 1, "jsx2scss: open /does/not/exist.jsx: "},
 		{[]string{"-nesting", "tree"}, 2, `unknown nesting "tree"`},
 		{[]string{"-indent", "x"}, 2, `invalid -indent "x"`},
 		{[]string{"-naming", "bootstrap"}, 2, `unknown naming preset "bootstrap"`},
 		{[]string{"-config", "x.json", "-no-config"}, 2, "mutually exclusive"},
-		{[]string{"-config", "/does/not/exist.json"}, 1, "no such file"},
+		{[]string{"-config", "/does/not/exist.json"}, 1, "exist.json"},
 		{[]string{"-bogus"}, 2, "flag provided but not defined: -bogus"},
 		{[]string{"a.jsx", "b.jsx"}, 2, "too many arguments"},
 		{[]string{"-i", "a.jsx", "b.jsx"}, 2, "both by -i and as an argument"},

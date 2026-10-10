@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"runtime"
 	"testing"
 
 	"scss-bem-gen/internal/bem"
@@ -101,11 +102,15 @@ func TestMapper(t *testing.T) {
 }
 
 func TestURIs(t *testing.T) {
-	uri := pathToURI("/tmp/a b/c#d.scss")
-	if uri != "file:///tmp/a%20b/c%23d.scss" {
-		t.Errorf("pathToURI = %s", uri)
+	path, want := "/tmp/a b/c#d.scss", protocol.DocumentURI("file:///tmp/a%20b/c%23d.scss")
+	if runtime.GOOS == "windows" {
+		path, want = `C:\tmp\a b\c#d.scss`, "file:///C:/tmp/a%20b/c%23d.scss"
 	}
-	if p, err := uriToPath(uri); err != nil || p != "/tmp/a b/c#d.scss" {
+	uri := pathToURI(path)
+	if uri != want {
+		t.Errorf("pathToURI = %s, want %s", uri, want)
+	}
+	if p, err := uriToPath(uri); err != nil || p != path {
 		t.Errorf("uriToPath = %q, %v", p, err)
 	}
 	if _, err := uriToPath("untitled:Untitled-1"); err == nil {

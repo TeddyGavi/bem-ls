@@ -1,0 +1,3 @@
+# Keep LF everywhere: golden files and position tests compare bytes.
+* text=auto eol=lf
+*.vsix binary

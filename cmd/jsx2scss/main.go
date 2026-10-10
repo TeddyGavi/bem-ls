@@ -53,8 +53,12 @@ Flags:
   -config FILE        read settings from FILE (default: nearest bem.config.json)
   -no-config          don't look for bem.config.json
   -force              write output even if the input has errors
+  -version            print the version
   -h, -help           show this help
 `
+
+// version is set at build time with -ldflags "-X main.version=...".
+var version = "dev"
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
@@ -84,7 +88,7 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("jsx2scss", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	var in, out, indent, nesting, naming, configPath string
-	var force, noConfig bool
+	var force, noConfig, showVersion bool
 	fs.StringVar(&in, "i", "", "")
 	fs.StringVar(&in, "input", "", "")
 	fs.StringVar(&out, "o", "", "")
@@ -95,11 +99,17 @@ func runErr(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	fs.StringVar(&configPath, "config", "", "")
 	fs.BoolVar(&noConfig, "no-config", false, "")
 	fs.BoolVar(&force, "force", false, "")
+	fs.BoolVar(&showVersion, "version", false, "")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return err
 		}
 		return fmt.Errorf("%w: %v", errUsage, err)
+	}
+
+	if showVersion {
+		_, err := fmt.Fprintln(stdout, "jsx2scss", version)
+		return err
 	}
 
 	switch fs.NArg() {

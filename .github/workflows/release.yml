@@ -1,0 +1,99 @@
+# Runs when a version tag is pushed (git tag v1.2.3 && git push origin v1.2.3).
+#
+# 1. goreleaser builds static binaries and creates the GitHub release.
+# 2. One VSIX per platform is packaged and attached to the release.
+# 3. The VSIX files are published to the VS Code Marketplace and Open VSX,
+#    if the VSCE_PAT / OVSX_PAT secrets are set. Pre-release tags
+#    (v1.2.3-rc.1) are not published.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    name: Binaries and GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Test before releasing
+        run: go test -count=1 ./...
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  vsix:
+    name: VSIX (${{ matrix.target }})
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [darwin-arm64, darwin-x64, linux-x64, linux-arm64, alpine-x64, alpine-arm64, win32-x64, win32-arm64]
+    defaults:
+      run:
+        working-directory: editors/vscode
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+      - run: npm ci
+      - name: Set the extension version from the tag
+        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+      - run: node scripts/package.mjs "${{ matrix.target }}" "${GITHUB_REF_NAME#v}"
+      - name: Attach to the GitHub release
+        run: gh release upload "$GITHUB_REF_NAME" vsix/*.vsix --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ matrix.target }}
+          path: editors/vscode/vsix/*.vsix
+
+  publish:
+    name: Publish to the marketplaces
+    needs: vsix
+    if: ${{ !contains(github.ref_name, '-') }}
+    runs-on: ubuntu-latest
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vsix-*
+          path: vsix
+          merge-multiple: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: VS Code Marketplace
+        if: env.VSCE_PAT != ''
+        run: npx --yes @vscode/vsce publish --packagePath vsix/*.vsix
+      - name: Open VSX
+        if: env.OVSX_PAT != ''
+        run: |
+          for f in vsix/*.vsix; do
+            npx --yes ovsx publish "$f" --pat "$OVSX_PAT"
+          done
+      - name: Note skipped publishing
+        if: env.VSCE_PAT == '' || env.OVSX_PAT == ''
+        run: echo "::notice::Set the VSCE_PAT and OVSX_PAT secrets to publish the extension."
