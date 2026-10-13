@@ -56,7 +56,7 @@ Editors validate the file against
 | `stylesheet.extensions` | `.module.scss`, `.scss`, `.module.css`, `.css`, `.module.sass`, `.sass` | Suffixes tried for sibling/parent lookups |
 | `stylesheet.maxSearchDepth` | `2` | Parent directories searched |
 | `stylesheet.loadPaths` | `[]` | Extra Sass load paths (root-relative) |
-| `stylesheet.aliases` | `{}` | Import prefixes, e.g. `{"@/": "src/"}` |
+| `stylesheet.aliases` | `{}` | Import prefixes, e.g. `{"@/": "src/"}`; applied to JS/stylesheet imports and Sass `@use`/`@forward`/`@import` URLs |
 | `stylesheet.exclude` | `node_modules`, `.git`, `dist`, `build`, … | Directories not indexed |
 | `stylesheet.globalFallback` | `true` | Resolve unreachable `$vars`/mixins to any global definition (injected partials) |
 | `generator.indent` | `2` | Spaces, or `"tab"` |

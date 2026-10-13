@@ -187,6 +187,33 @@ func TestResolveSass(t *testing.T) {
 	}
 }
 
+func TestResolveSassAliases(t *testing.T) {
+	root := t.TempDir()
+	for name, content := range map[string]string{
+		"packages/utilities/src/styles/_tokens.scss": "$gap: 4px;",
+		"apps/web/Card.scss":                         `@use "@Utilities/styles/tokens";`,
+	} {
+		p := filepath.Join(root, filepath.FromSlash(name))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ix, err := New(root, Config{Aliases: map[string]string{"@Utilities/": "packages/utilities/src/"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, ok := ix.ResolveSass(filepath.Join(root, "apps/web/Card.scss"), "@Utilities/styles/tokens")
+	if !ok {
+		t.Fatal("aliased @use did not resolve")
+	}
+	if got := rel(root, p)[0]; got != "packages/utilities/src/styles/_tokens.scss" {
+		t.Errorf("resolved %q, want packages/utilities/src/styles/_tokens.scss", got)
+	}
+}
+
 // refsIn resolves every reference in a stylesheet and renders
 // "name->file:line".
 func refsIn(t *testing.T, ix *Index, root, path string) []string {

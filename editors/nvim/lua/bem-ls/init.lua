@@ -10,6 +10,9 @@ local STYLE_FILETYPES = { scss = true, css = true, sass = true }
 ---@class bem_ls.Options
 ---@field cmd? string[] Command to start the server; default { 'bem-ls' }.
 ---@field filetypes? string[] Filetypes to attach to.
+---@field root_markers? string[] Files that mark the workspace root, in
+---priority order (the first marker found wins). Overrides the default in
+---lsp/bem_ls.lua; use it to root at a monorepo root instead of a package.
 ---@field settings? table Server settings (the "bem" section), e.g. { naming = { preset = 'kv' } }.
 ---@field ghost_text? boolean Show missing selectors as ghost text in stylesheets; default true.
 ---@field accept_key? string|false Insert-mode key that accepts ghost text; default '<Tab>'. false: no mapping.
@@ -74,6 +77,9 @@ function M.setup(opts)
   end
   if o.filetypes then
     cfg.filetypes = o.filetypes
+  end
+  if o.root_markers then
+    cfg.root_markers = o.root_markers
   end
   vim.lsp.config(NAME, cfg)
 

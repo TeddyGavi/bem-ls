@@ -34,12 +34,16 @@ Without `setup()`, `vim.lsp.enable('bem_ls')` uses the defaults in
 require('bem-ls').setup({
   cmd = { 'bem-ls' },        -- server command
   filetypes = nil,           -- default: tsx/jsx/ts/js/scss/css/sass
+  root_markers = nil,        -- default: bem.config.json, package.json, .git
   settings = {},             -- the "bem" settings; see docs/configuration.md
   ghost_text = true,         -- inline suggestions in stylesheets
   accept_key = '<Tab>',      -- insert-mode key that accepts them (false: none)
   on_attach = nil,           -- function(client, bufnr)
 })
 ```
+
+In a monorepo, root the server at the repo root (not the nearest package):
+`root_markers = { 'turbo.json', 'bem.config.json', 'package.json', '.git' }`.
 
 A `bem.config.json` at the project root overrides `settings`.
 

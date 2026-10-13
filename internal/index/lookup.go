@@ -227,6 +227,22 @@ func dedupe(in []string) []string {
 
 var jsResolveExts = []string{".tsx", ".ts", ".jsx", ".js", ".mjs", ".cjs"}
 
+// aliasPath maps an aliased specifier ("@Utilities/x") through cfg.Aliases
+// to a path relative to the root ("packages/utilities/src/x"). The longest
+// matching prefix wins, so overlapping aliases are deterministic.
+func (ix *Index) aliasPath(spec string) (string, bool) {
+	prefix, target := "", ""
+	for p, t := range ix.cfg.Aliases {
+		if strings.HasPrefix(spec, p) && len(p) > len(prefix) {
+			prefix, target = p, t
+		}
+	}
+	if prefix == "" {
+		return "", false
+	}
+	return filepath.Join(filepath.FromSlash(target), filepath.FromSlash(strings.TrimPrefix(spec, prefix))), true
+}
+
 // resolveJSImport resolves a JS import specifier from a file: relative
 // ("./x"), root-absolute ("/src/x") or aliased ("@/x"). Package imports
 // are not resolved. stylesheet selects exact-file resolution for
@@ -240,17 +256,11 @@ func (ix *Index) resolveJSImport(from, spec string, stylesheet bool) (string, bo
 	case strings.HasPrefix(spec, "/"):
 		base = filepath.Join(ix.root, filepath.FromSlash(spec))
 	default:
-		matched := false
-		for prefix, target := range ix.cfg.Aliases {
-			if strings.HasPrefix(spec, prefix) {
-				base = filepath.Join(ix.root, filepath.FromSlash(target), filepath.FromSlash(strings.TrimPrefix(spec, prefix)))
-				matched = true
-				break
-			}
-		}
-		if !matched {
+		rel, ok := ix.aliasPath(spec)
+		if !ok {
 			return "", false
 		}
+		base = filepath.Join(ix.root, rel)
 	}
 	if stylesheet {
 		return base, isFile(base)
@@ -273,12 +283,19 @@ func (ix *Index) resolveJSImport(from, spec string, stylesheet bool) (string, bo
 
 // ResolveSass resolves a @use/@forward/@import URL the way Sass does:
 // relative to the file, then each load path; trying partials (_x), the
-// .scss, .sass and .css extensions, and index files.
+// .scss, .sass and .css extensions, and index files. Aliased URLs
+// ("@Utilities/x") resolve against the root like JS import specifiers.
 func (ix *Index) ResolveSass(from, url string) (string, bool) {
 	if strings.HasPrefix(url, "sass:") || strings.Contains(url, "://") || strings.HasPrefix(url, "//") {
 		return "", false
 	}
-	url = filepath.FromSlash(strings.TrimPrefix(url, "~"))
+	url = strings.TrimPrefix(url, "~")
+	if rel, ok := ix.aliasPath(url); ok {
+		if p, ok := sassCandidates(filepath.Join(ix.root, rel)); ok {
+			return p, true
+		}
+	}
+	url = filepath.FromSlash(url)
 	dirs := []string{filepath.Dir(ix.abs(from))}
 	for _, lp := range ix.cfg.LoadPaths {
 		dirs = append(dirs, filepath.Join(ix.root, filepath.FromSlash(lp)))

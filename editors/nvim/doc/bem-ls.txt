@@ -17,6 +17,9 @@ Options:
   cmd         Server command. Default `{ 'bem-ls' }`.
   filetypes   Filetypes to attach to. Default: typescriptreact,
               javascriptreact, typescript, javascript, scss, css, sass.
+  root_markers  Files that mark the workspace root, in priority order.
+              Default: bem.config.json, package.json, .git. Override to root
+              at a monorepo root instead of the nearest package.
   settings    Server settings (the "bem" section). A `bem.config.json` at
               the project root overrides them.
   ghost_text  Show missing selectors as ghost text in stylesheets.
