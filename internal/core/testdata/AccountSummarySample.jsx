@@ -19,7 +19,7 @@
                 <div className='plan-summary__plan__old-plan-container__row1__text'>{localized['accountSummary.totalSavings.oldPlanText']}</div>
               </div>
               <div className='plan-summary__plan__old-plan-container__row2'>
-                <Button size='small' variant="text" onClick={() => {})}>
+                <Button size='small' variant="text" onClick={() => {}}>
                   {localized['accountSummary.totalSavings.viewNewPlanBtn']}
                 </Button>
               </div>
