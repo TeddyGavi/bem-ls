@@ -82,7 +82,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Log in to Azure using Entra ID OIDC
         uses: azure/login@v2
@@ -95,6 +95,7 @@ jobs:
         run: npm install -g @vscode/vsce
 
       - name: Publish to Visual Studio Marketplace
+        working-directory: editors/vscode
         run: vsce publish --azure-credential
 
       - uses: actions/download-artifact@v4
