@@ -27,7 +27,7 @@ Editors validate the file against
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/TeddyGavi/scss-bem-gen/main/schema/bem.config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/TeddyGavi/bem-ls/main/schema/bem.config.schema.json",
   "naming": { "preset": "classic" },
   "rules": {
     "nestedElement": "off",

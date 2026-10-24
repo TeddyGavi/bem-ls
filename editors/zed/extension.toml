@@ -4,7 +4,7 @@ description = "BEM class checks, completion and navigation for React components 
 version = "0.1.0"
 schema_version = 1
 authors = ["TeddyGavi"]
-repository = "https://github.com/TeddyGavi/scss-bem-gen"
+repository = "https://github.com/TeddyGavi/bem-ls"
 
 [language_servers.bem-ls]
 name = "bem-ls"

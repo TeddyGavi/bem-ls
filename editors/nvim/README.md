@@ -13,7 +13,7 @@ With lazy.nvim:
 
 ```lua
 {
-  'TeddyGavi/scss-bem-gen',
+  'TeddyGavi/bem-ls',
   config = function(plugin)
     vim.opt.rtp:append(plugin.dir .. '/editors/nvim')
     require('bem-ls').setup({

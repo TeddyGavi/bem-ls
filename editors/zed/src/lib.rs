@@ -12,7 +12,7 @@ use std::fs;
 use zed_extension_api::{self as zed, settings::LspSettings, LanguageServerId, Result};
 
 /// GitHub repository the releases come from.
-const REPO: &str = "TeddyGavi/scss-bem-gen";
+const REPO: &str = "TeddyGavi/bem-ls";
 /// Language server name, as in extension.toml.
 const SERVER: &str = "bem-ls";
 

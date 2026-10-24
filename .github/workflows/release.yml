@@ -52,7 +52,7 @@ jobs:
           go-version: stable
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: editors/vscode/package-lock.json
       - run: npm ci
@@ -73,27 +73,43 @@ jobs:
     needs: vsix
     if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
-      VSCE_PAT: ${{ secrets.VSCE_PAT }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Log in to Azure using Entra ID OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Publish to Visual Studio Marketplace
+        run: vsce publish --azure-credential
+
       - uses: actions/download-artifact@v4
         with:
           pattern: vsix-*
           path: vsix
           merge-multiple: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: VS Code Marketplace
-        if: env.VSCE_PAT != ''
-        run: npx --yes @vscode/vsce publish --packagePath vsix/*.vsix
-      - name: Open VSX
+
+      - name: Publish to Open VSX
         if: env.OVSX_PAT != ''
         run: |
           for f in vsix/*.vsix; do
             npx --yes ovsx publish "$f" --pat "$OVSX_PAT"
           done
-      - name: Note skipped publishing
-        if: env.VSCE_PAT == '' || env.OVSX_PAT == ''
-        run: echo "::notice::Set the VSCE_PAT and OVSX_PAT secrets to publish the extension."
+
+      - name: Note skipped Open VSX publishing
+        if: env.OVSX_PAT == ''
+        run: echo "::notice::OVSX_PAT is not configured; skipping Open VSX publishing."

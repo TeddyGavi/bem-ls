@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TeddyGavi/scss-bem-gen"
+    "url": "https://github.com/TeddyGavi/bem-ls"
   },
   "engines": {
     "vscode": "^1.91.0"
