@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // NodeKind is the kind of a Node.

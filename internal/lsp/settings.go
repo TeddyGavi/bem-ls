@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/config"
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/generator"
-	"scss-bem-gen/internal/index"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/config"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/index"
 )
 
 // Settings is the server configuration; see package config.

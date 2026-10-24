@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 // diagCodes waits until the diagnostics of rel satisfy ok.

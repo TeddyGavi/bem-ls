@@ -1,3 +1,3 @@
-module scss-bem-gen
+module bem-ls
 
 go 1.23.0

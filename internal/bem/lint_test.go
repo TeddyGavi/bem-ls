@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")
@@ -160,8 +160,12 @@ func TestLintStylesheet(t *testing.T) {
 		return core.Range{Start: core.Position{Offset: off, Line: 1, Col: off + 1}}
 	}
 	defs := []ClassDef{
-		{"card", pos(0)}, {"card--lg", pos(1)}, {"my-item", pos(2)}, {"myItem", pos(3)},
-		{"card__unused", pos(4)}, {"js-hook", pos(5)},
+		{"card", pos(0)},
+		{"card--lg", pos(1)},
+		{"my-item", pos(2)},
+		{"myItem", pos(3)},
+		{"card__unused", pos(4)},
+		{"js-hook", pos(5)},
 	}
 	var got []string
 	for _, d := range l.LintStylesheet(defs, used) {

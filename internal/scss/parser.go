@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // Parse parses SCSS or CSS. It never fails: problems are recorded in
@@ -545,8 +545,10 @@ func (p *parser) parseAtRule(parent *Node, ctx context, kw Item) {
 		nameTok, paramsText, paramToks, _ := splitCallable(params)
 		var sym *Symbol
 		if nameTok.Typ == itemIdent {
-			sym = &Symbol{Kind: kind, Name: nameTok.Val, Range: p.rangeOf(nameTok), Full: stmtRange,
-				Scope: ctx.scope, Params: strings.TrimSpace(paramsText), Doc: doc}
+			sym = &Symbol{
+				Kind: kind, Name: nameTok.Val, Range: p.rangeOf(nameTok), Full: stmtRange,
+				Scope: ctx.scope, Params: strings.TrimSpace(paramsText), Doc: doc,
+			}
 			p.sheet.Symbols = append(p.sheet.Symbols, sym)
 		}
 		n := block(context{scope: ctx.scope}, func(n *Node) {

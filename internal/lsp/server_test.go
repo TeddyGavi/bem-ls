@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"scss-bem-gen/internal/lsp/jsonrpc"
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/jsonrpc"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 var testWorkspace = map[string]string{

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")

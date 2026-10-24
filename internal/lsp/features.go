@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/index"
-	"scss-bem-gen/internal/lsp/protocol"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/index"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // ---------------------------------------------------------------------------

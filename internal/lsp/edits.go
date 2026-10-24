@@ -4,9 +4,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/lsp/protocol"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // addSelectors returns text with an empty rule added for each class it

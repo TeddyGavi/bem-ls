@@ -11,7 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // ItemType identifies a token.

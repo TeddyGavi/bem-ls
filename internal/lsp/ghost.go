@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/generator"
-	"scss-bem-gen/internal/index"
-	"scss-bem-gen/internal/lsp/protocol"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/index"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // missing describes what a stylesheet lacks for the components paired

@@ -1,4 +1,4 @@
-# scss-bem-gen
+# bem-ls
 
 Tools for BEM class names in React components and their stylesheets:
 

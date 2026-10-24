@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // Diagnostic is one finding.

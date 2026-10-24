@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // Nesting selects how rules are nested in the output.

@@ -12,7 +12,6 @@ export default function SchoolTooltip({
   mins,
   kilometers,
   averageTuition,
-  programCount,
   localized = {}
 }) {
   return (
@@ -26,13 +25,13 @@ export default function SchoolTooltip({
         </div>
         <div className='school-pin-tooltip__content__tuition'>
           <span className='school-pin-tooltip__content__tuition__text'>
-            {localized['programMatchMap.schoolPin.tuitionText'] || ''}
+            {''}
           </span>
           <span className='school-pin-tooltip__content__tuition__total'>
             {averageTuition}
           </span>
           <span className='school-pin-tooltip__content__tuition__yr'>
-            {localized['programMatchMap.schoolPin.tuitionYear'] || ''}
+            {''}
           </span>
         </div>
         <div className='school-pin-tooltip__content__distance-programs'>
@@ -53,7 +52,7 @@ export default function SchoolTooltip({
               alt={localized['img.alt.folderIcon'] || ''}
             />
             <div className='school-pin-tooltip__content__distance-programs__program__details'>
-              {programCount || 0} {localized['programMatcher.schoolList.programs']}
+              {0} {}
             </div>
           </div>
         </div>

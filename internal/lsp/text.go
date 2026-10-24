@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 // uriToPath converts a file:// URI to a local path.

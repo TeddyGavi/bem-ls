@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // workspace is the test project, written to a temp dir.

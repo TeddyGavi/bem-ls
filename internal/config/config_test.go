@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"scss-bem-gen/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
 )
 
 func TestParse(t *testing.T) {

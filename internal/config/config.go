@@ -17,8 +17,8 @@ import (
 	"strconv"
 	"strings"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
 )
 
 // FileName is the project configuration file.

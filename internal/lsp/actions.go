@@ -10,13 +10,13 @@ import (
 	"strings"
 	"unicode"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/generator"
-	"scss-bem-gen/internal/index"
-	"scss-bem-gen/internal/lsp/jsonrpc"
-	"scss-bem-gen/internal/lsp/protocol"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/index"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/jsonrpc"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // ---------------------------------------------------------------------------

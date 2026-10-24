@@ -3,8 +3,8 @@ package generator_test
 import (
 	"fmt"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/generator"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/generator"
 )
 
 // This example replaces the old demo in the repository's root main.go.

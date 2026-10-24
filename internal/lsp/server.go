@@ -16,11 +16,11 @@ import (
 	"sync"
 	"time"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/config"
-	"scss-bem-gen/internal/index"
-	"scss-bem-gen/internal/lsp/jsonrpc"
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/config"
+	"github.com/TeddyGavi/bem-ls/internal/index"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/jsonrpc"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 // Server is the language server. Create it with NewServer and call Run.

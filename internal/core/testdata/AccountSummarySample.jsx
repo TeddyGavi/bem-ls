@@ -5,11 +5,11 @@
         <div className='plan-summary__semi_annulus' ref={semiAnnulus} style={{ transform: semiAnnulusTranslate }}><img src={SemiAnnulus} alt='semi annulus' /></div>
         <div className='plan-summary__small_annulus' ref={smallAnnulus} style={{ transform: smallAnnulusTranslateY }}><img src={SmallAnnulus} alt='small annulus' /></div>
         <div className='plan-summary__square' ref={square} style={{ transform: squareTranslate }}><img src={Square} alt='square' /></div>
-        <div className="plan-summary__plan__name">{planAccount && getAccountSummaryLabel(localized, planAccount)}</div>
+        <div className="plan-summary__plan__name">{}</div>
         <div className="plan-summary__plan__savings-label">{localized['accountSummary.totalSavings']}</div>
         <div className="plan-summary__plan__savings-amount">{(RespSavings) && formatCurrency(RespSavings, locale) || '-'}</div>
         <div className="plan-summary__plan__savings-return">
-          <SavingsReturn planAmounts={planAmounts} />
+          <SavingsReturn planAmounts={{}} />
         </div>
         {
           isPlanTransferInProgressOld
@@ -19,12 +19,12 @@
                 <div className='plan-summary__plan__old-plan-container__row1__text'>{localized['accountSummary.totalSavings.oldPlanText']}</div>
               </div>
               <div className='plan-summary__plan__old-plan-container__row2'>
-                <Button size='small' variant="text" onClick={() => browserHistory.push(`/resp/main/account/${newPlanAccountFromPlanTransfer}`)}>
+                <Button size='small' variant="text" onClick={() => {})}>
                   {localized['accountSummary.totalSavings.viewNewPlanBtn']}
                 </Button>
               </div>
             </div>
-            : <Button className="plan-summary__plan__contribute" size='large' variant="text" data-testid="account-summary-contribute" onClick={redirectToContribution}>
+            : <Button className="plan-summary__plan__contribute" size='large' variant="text" data-testid="account-summary-contribute" onClick={() => {}}>
               {localized && localized['contribute']}
             </Button>
         }

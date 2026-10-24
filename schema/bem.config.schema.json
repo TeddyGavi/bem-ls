@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/TeddyGavi/scss-bem-gen/schema/bem.config.schema.json",
+  "$id": "https://github.com/TeddyGavi/bem-ls/schema/bem.config.schema.json",
   "title": "bem-ls configuration",
   "description": "Configuration for the BEM language server and jsx2scss. Values here override editor settings.",
   "type": "object",

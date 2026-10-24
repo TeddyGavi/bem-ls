@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // Config controls the index. The zero value gives the defaults.

@@ -19,7 +19,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"scss-bem-gen/internal/lsp"
+	"github.com/TeddyGavi/bem-ls/internal/lsp"
 )
 
 // version is set at build time with -ldflags "-X main.version=...".

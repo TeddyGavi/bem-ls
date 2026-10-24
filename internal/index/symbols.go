@@ -3,9 +3,9 @@ package index
 import (
 	"strings"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/core"
-	"scss-bem-gen/internal/scss"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/scss"
 )
 
 // Location is a range in a file.

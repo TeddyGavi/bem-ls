@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"testing"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 func TestAddSelectors(t *testing.T) {

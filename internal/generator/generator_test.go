@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"scss-bem-gen/internal/bem"
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/bem"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 func gen(t *testing.T, src string, opts Options) string {

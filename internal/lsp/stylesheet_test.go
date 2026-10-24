@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"scss-bem-gen/internal/lsp/protocol"
+	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
 
 // stylesheetWorkspace adds files for phase 5 to the base test workspace.

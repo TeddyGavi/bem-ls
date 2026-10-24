@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"scss-bem-gen/internal/core"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")
