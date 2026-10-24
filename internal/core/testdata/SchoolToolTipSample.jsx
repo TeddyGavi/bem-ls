@@ -12,6 +12,7 @@ export default function SchoolTooltip({
   mins,
   kilometers,
   averageTuition,
+  programCount,
   localized = {}
 }) {
   return (
