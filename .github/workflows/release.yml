@@ -94,21 +94,17 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
-      - name: Debug extension directory
-        run: |
-          pwd
-          ls -la
-          find . -name package.json -not -path '*/node_modules/*' -not -path '*/.git/*'
-
-      - name: Publish to Visual Studio Marketplace
-        working-directory: editors/vscode
-        run: vsce publish --azure-credential
-
       - uses: actions/download-artifact@v4
         with:
           pattern: vsix-*
           path: vsix
           merge-multiple: true
+
+      - name: Publish to Visual Studio Marketplace
+        run: |
+          for f in vsix/*.vsix; do
+            vsce publish --packagePath "$f" --azure-credential
+          done
 
       - name: Publish to Open VSX
         if: env.OVSX_PAT != ''
