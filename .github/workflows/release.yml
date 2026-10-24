@@ -94,6 +94,12 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
+      - name: Debug extension directory
+        run: |
+          pwd
+          ls -la
+          find . -name package.json -not -path '*/node_modules/*' -not -path '*/.git/*'
+
       - name: Publish to Visual Studio Marketplace
         working-directory: editors/vscode
         run: vsce publish --azure-credential
