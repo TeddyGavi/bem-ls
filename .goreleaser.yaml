@@ -11,6 +11,33 @@ before:
   hooks:
     - go mod tidy
 
+homebrew_casks:
+  - name: bem-ls
+    ids:
+      - bem-ls
+    binaries:
+      - bem-ls
+    homepage: "https://github.com/TeddyGavi/bem-ls"
+    description: "BEM language server and tooling"
+    repository:
+      owner: TeddyGavi
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+
+  - name: jsx2scss
+    ids:
+      - jsx2scss
+    binaries:
+      - jsx2scss
+    homepage: "https://github.com/TeddyGavi/bem-ls"
+    description: "Convert JSX to SCSS"
+    repository:
+      owner: TeddyGavi
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+
 builds:
   - id: bem-ls
     main: ./cmd/bem-ls

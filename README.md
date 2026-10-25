@@ -9,6 +9,8 @@ Tools for BEM class names in React components and their stylesheets:
 
 Everything is written in Go with no third-party dependencies.
 
+Codespace demo available!
+
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](
   https://codespaces.new/TeddyGavi/bem-ls-demo
 )

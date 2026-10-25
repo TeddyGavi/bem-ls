@@ -19,9 +19,20 @@ jobs:
     name: Binaries and GitHub release
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Generate Homebrew tap token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: TeddyGavi
+          repositories: homebrew-tap
+
       - uses: actions/setup-go@v5
         with:
           go-version: stable
@@ -34,6 +45,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   vsix:
     name: VSIX (${{ matrix.target }})
