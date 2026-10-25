@@ -32,7 +32,9 @@ Actions). Without them, step 3 is skipped with a notice.
 
 | Secret | Where to get it |
 |---|---|
-| `VSCE_PAT` | An Azure DevOps personal access token with the *Marketplace: Manage* scope, for the publisher in `editors/vscode/package.json` (`teddygavi`) |
+| `AZURE_TENANT_ID` | An Azure Tenant configured via entra Id and with the *Marketplace: Manage* scope, for the publisher in `editors/vscode/package.json` (`teddygavi`) |
+| `AZURE_CLIENT_ID` | An Azure Client with federated credential id with the *Marketplace: Manage* scope, for the publisher in `editors/vscode/package.json` (`teddygavi`) |
+| `AZURE_SUBSCRIPTION_ID` | An Azure sub scriptions and matching entra id with the *Marketplace: Manage* scope, for the publisher in `editors/vscode/package.json` (`teddygavi`) |
 | `OVSX_PAT` | An access token from open-vsx.org, for the same namespace |
 
 ## Local packaging
