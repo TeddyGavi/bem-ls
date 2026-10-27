@@ -5,7 +5,7 @@
 # Local dry run (nothing is published): make snapshot
 version: 2
 
-project_name: scss-bem-gen
+project_name: bem-ls
 
 before:
   hooks:
@@ -55,6 +55,23 @@ builds:
     ldflags: ["-s -w -X main.version={{ .Version }}"]
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
+
+
+notarize:
+  macos:
+    - enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      ids:
+        - bem-ls
+        - jsx2scss
+      sign:
+        certificate: "{{ .Env.MACOS_SIGN_P12 }}"
+        password: "{{ .Env.MACOS_SIGN_PASSWORD }}"
+      notarize:
+        issuer_id: "{{ .Env.MACOS_NOTARY_ISSUER_ID }}"
+        key_id: "{{ .Env.MACOS_NOTARY_KEY_ID }}"
+        key: "{{ .Env.MACOS_NOTARY_KEY }}"
+        wait: true
+        timeout: 20m
 
 archives:
   - id: bem-ls
