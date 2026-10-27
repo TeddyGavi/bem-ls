@@ -13,6 +13,8 @@ before:
 
 homebrew_casks:
   - name: bem-ls
+    signs:
+      - artifacts: checksum
     ids:
       - bem-ls
     binaries:
