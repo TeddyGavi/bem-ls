@@ -121,5 +121,5 @@ jobs:
       - name: Publish to Open VSX Trusted publishing
         run: |
           for f in vsix/*.vsix; do
-            npx ovsx publish --trusted-publishing
+            npx --yes ovsx publish "$f" --trusted-publishing
           done
