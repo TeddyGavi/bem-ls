@@ -118,13 +118,8 @@ jobs:
             vsce publish --packagePath "$f" --azure-credential
           done
 
-      - name: Publish to Open VSX
-        if: env.OVSX_PAT != ''
+      - name: Publish to Open VSX Trusted publishing
         run: |
           for f in vsix/*.vsix; do
-            npx --yes ovsx publish "$f" --pat "$OVSX_PAT"
+            npx ovsx publish --trusted-publishing
           done
-
-      - name: Note skipped Open VSX publishing
-        if: env.OVSX_PAT == ''
-        run: echo "::notice::OVSX_PAT is not configured; skipping Open VSX publishing."
