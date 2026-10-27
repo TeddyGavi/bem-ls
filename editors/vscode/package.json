@@ -2,8 +2,9 @@
   "name": "bem-ls",
   "displayName": "BEM for JSX & SCSS",
   "description": "BEM class checks, completion, navigation and SCSS ghost text for React components and their stylesheets.",
-  "version": "0.1.0",
+  "version": "0.1.22",
   "publisher": "teddygavi",
+  "icon": "images/bem-ls-cat.png"
   "license": "MIT",
   "repository": {
     "type": "git",
