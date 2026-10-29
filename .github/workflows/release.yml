@@ -3,7 +3,7 @@
 # 1. goreleaser builds static binaries and creates the GitHub release.
 # 2. One VSIX per platform is packaged and attached to the release.
 # 3. The VSIX files are published to the VS Code Marketplace and Open VSX,
-#    if the VSCE_PAT / OVSX_PAT secrets are set. Pre-release tags
+#    Using Entra ID and Trusted publishing, not longer using PATs. Pre-release tags
 #    (v1.2.3-rc.1) are not published.
 name: Release
 
