@@ -14,13 +14,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/textproto"
 	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/TeddyGavi/bem-ls/internal/core"
 )
 
 // Error codes from JSON-RPC and LSP.
@@ -96,7 +97,7 @@ type Conn struct {
 	r       *bufio.Reader
 	w       io.Writer
 	handler Handler
-	log     *log.Logger
+	log     *core.Logger
 
 	writeMu sync.Mutex
 
@@ -110,9 +111,10 @@ type Conn struct {
 
 // NewConn returns a connection reading from r and writing to w. logger may
 // be nil.
-func NewConn(r io.Reader, w io.Writer, handler Handler, logger *log.Logger) *Conn {
+func NewConn(r io.Reader, w io.Writer, handler Handler, logger *core.Logger) *Conn {
 	if logger == nil {
-		logger = log.New(io.Discard, "", 0)
+		logger = core.NewLogger("jsonrpc")
+		logger.SetOutput(io.Discard)
 	}
 	return &Conn{
 		r:       bufio.NewReader(r),
@@ -141,7 +143,7 @@ func (c *Conn) Run(ctx context.Context) error {
 		}
 		var msg wireMessage
 		if err := json.Unmarshal(body, &msg); err != nil {
-			c.log.Printf("jsonrpc: bad message: %v", err)
+			c.log.Infof("jsonrpc: bad message: %v", err)
 			c.replyError(nil, Errorf(CodeParseError, "parse error: %v", err))
 			continue
 		}
@@ -190,7 +192,7 @@ func (c *Conn) handleNotification(ctx context.Context, req *Request) {
 	}
 	defer c.recoverPanic(req, nil)
 	if _, err := c.handler(ctx, req); err != nil && err != ErrMethodNotFound {
-		c.log.Printf("jsonrpc: notification %s: %v", req.Method, err)
+		c.log.Infof("jsonrpc: notification %s: %v", req.Method, err)
 	}
 }
 
@@ -231,7 +233,7 @@ func (c *Conn) startRequest(ctx context.Context, req *Request) {
 
 func (c *Conn) recoverPanic(req *Request, id *json.RawMessage) {
 	if r := recover(); r != nil {
-		c.log.Printf("jsonrpc: panic in %s: %v\n%s", req.Method, r, debug.Stack())
+		c.log.Infof("jsonrpc: panic in %s: %v\n%s", req.Method, r, debug.Stack())
 		if id != nil {
 			c.replyError(id, Errorf(CodeInternalError, "internal error: %v", r))
 		}
@@ -306,7 +308,7 @@ func (c *Conn) deliverResponse(msg wireMessage) {
 	if ok {
 		ch <- msg
 	} else {
-		c.log.Printf("jsonrpc: response for unknown id %s", *msg.ID)
+		c.log.Infof("jsonrpc: response for unknown id %s", *msg.ID)
 	}
 }
 
@@ -352,7 +354,7 @@ func (c *Conn) readMessage() ([]byte, error) {
 func (c *Conn) write(msg any) error {
 	body, err := json.Marshal(msg)
 	if err != nil {
-		c.log.Printf("jsonrpc: marshal: %v", err)
+		c.log.Infof("jsonrpc: marshal: %v", err)
 		return err
 	}
 	c.writeMu.Lock()

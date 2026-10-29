@@ -31,10 +31,14 @@ func (l *Logger) SetOutput(w io.Writer) {
 }
 
 // Info logs an informational message.
-func (l *Logger) Info(msg string) { l.log("INFO", msg, nil) }
+func (l *Logger) Infof(format string, args ...any) {
+	l.log("INFO", fmt.Sprintf(format, args...), nil)
+}
 
-// Error logs msg together with err.
-func (l *Logger) Error(err error, msg string) { l.log("ERROR", msg, err) }
+// Errorf logs a formatted error message together with err.
+func (l *Logger) Errorf(err error, format string, args ...any) {
+	l.log("ERROR", fmt.Sprintf(format, args...), err)
+}
 
 func (l *Logger) log(level, msg string, err error) {
 	l.mu.Lock()

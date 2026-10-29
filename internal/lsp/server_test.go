@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TeddyGavi/bem-ls/internal/core"
 	"github.com/TeddyGavi/bem-ls/internal/lsp/jsonrpc"
 	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
 )
@@ -102,10 +103,24 @@ func newClientWith(t *testing.T, opts clientOptions) *client {
 	}
 	inR, inW := io.Pipe()
 	outR, outW := io.Pipe()
+
+	var logger *core.Logger
+	if os.Getenv("BEM_LS_TEST_LOG") != "" {
+		logger = core.NewLogger("lsp-test")
+	} else {
+		logger = core.NewLogger("lsp-test")
+		logger.SetOutput(io.Discard)
+	}
+
 	c := &client{
-		t: t, root: root, srv: NewServer("test", nil), w: inW, done: make(chan error, 1),
-		pending: map[int]chan rpcReply{}, diags: map[protocol.DocumentURI][]protocol.PublishDiagnosticsParams{},
-		diagCh: make(chan struct{}, 100), configSection: opts.configuration,
+		t: t, root: root,
+		srv:           NewServer("test", logger),
+		w:             inW,
+		done:          make(chan error, 1),
+		pending:       map[int]chan rpcReply{},
+		diags:         map[protocol.DocumentURI][]protocol.PublishDiagnosticsParams{},
+		diagCh:        make(chan struct{}, 100),
+		configSection: opts.configuration,
 	}
 	go func() {
 		c.done <- c.srv.Run(context.Background(), inR, outW)

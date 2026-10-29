@@ -230,28 +230,30 @@ func (ix *Index) abs(path string) string {
 // an older version are ignored.
 func (ix *Index) Open(path string, version int, text string) *Doc {
 	path = ix.abs(path)
-	ix.mu.Lock()
-	if ov, ok := ix.open[path]; ok && ov.version > version {
+	ix.mu.RLock()
+	ov, ok := ix.open[path]
+	if ok && ov.version > version {
 		d := ix.docs[path]
-		ix.mu.Unlock()
+		ix.mu.RUnlock()
 		return d
+	}
+	ix.mu.RUnlock()
+	d := ix.parse(path, text, version, time.Time{}, int64(len(text)))
+	ix.mu.Lock()
+	defer ix.mu.Unlock()
+	if ov, ok := ix.open[path]; ok && ov.version > version {
+		return ix.docs[path]
 	}
 	_, existed := ix.docs[path]
 	ix.open[path] = overlay{version: version, text: text}
-	ix.mu.Unlock()
+	ix.docs[path] = d
 
-	d := ix.parse(path, text, version, time.Time{}, int64(len(text)))
-	ix.mu.Lock()
-	if ov := ix.open[path]; ov.version == version {
-		ix.docs[path] = d
-	}
 	if d.Kind == KindStylesheet {
 		ix.sheetGen++
 		if !existed {
 			ix.gen++
 		}
 	}
-	ix.mu.Unlock()
 	return d
 }
 

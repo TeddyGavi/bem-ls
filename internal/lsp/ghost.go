@@ -103,21 +103,39 @@ func (s *Server) skeleton(cfg *compiled, ms missing) string {
 // Inline completion (ghost text)
 
 func (s *Server) inlineCompletion(ctx context.Context, p protocol.InlineCompletionParams) (*protocol.InlineCompletionList, error) {
+	s.log.Infof("ghostText: request uri=%s position=%+v",
+		p.TextDocument.URI, p.Position)
 	empty := &protocol.InlineCompletionList{Items: []protocol.InlineCompletionItem{}}
 	d, m, off, err := s.docAt(p.TextDocument.URI, p.Position)
-	if err != nil || d.Kind != index.KindStylesheet || d.Sheet == nil {
+	if err != nil {
+		s.log.Errorf(err, "ghostText: docAt failed kind=%v", d.Kind)
 		return empty, nil
 	}
-	ix, cfg, _ := s.state()
-	if !cfg.ghostText || !onBlankLine(d.Text, off) {
-		return empty, nil // checked first: this request comes on most keystrokes
+	if d.Kind != index.KindStylesheet || d.Sheet == nil {
+		s.log.Infof("ghostText: invalid document: kind=%v sheetNil=%v",
+			d.Kind, d.Sheet == nil)
+		return empty, nil
 	}
+
+	ix, cfg, _ := s.state()
+	if !cfg.ghostText {
+		s.log.Infof("ghostText: disabled in config")
+		return empty, nil
+	}
+	if !onBlankLine(d.Text, off) {
+		s.log.Infof("ghostText: not blank line: offset=%d text=%q", off, d.Text)
+		return empty, nil
+	}
+
 	ms := s.missingSelectors(ix, cfg, d.Path)
 	if len(ms.classes) == 0 {
+		s.log.Infof("ghostText: no missing classes for %q", d.Path)
 		return empty, nil
 	}
+
 	insert, start := ghostText(d.Text, d.Sheet, off, ms, cfg, s)
 	if insert == "" {
+		s.log.Infof("ghostText: empty insertion; classes=%v offset=%d", ms.classes, off)
 		return empty, nil
 	}
 	r := m.rangeOfOffsets(start, off)

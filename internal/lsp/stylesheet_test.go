@@ -282,6 +282,7 @@ func TestGhostText(t *testing.T) {
 	// Inside .card on a blank, indented line: its missing children.
 	got, r, ok := c.ghost(rel, ".card {\n  color: red;\n  |\n  &__title {}\n}\n", 2)
 	if !ok || got != "  &__body {}\n  &__text {}" || r.Start.Character != 0 || r.End.Character != 2 {
+		t.Logf("ghost completion: text=%q range=%+v", got, r)
 		t.Errorf("inside .card: %q %+v", got, r)
 	}
 	// Inside &__title: its modifier.

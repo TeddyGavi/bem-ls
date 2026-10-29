@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -18,6 +17,7 @@ import (
 
 	"github.com/TeddyGavi/bem-ls/internal/bem"
 	"github.com/TeddyGavi/bem-ls/internal/config"
+	"github.com/TeddyGavi/bem-ls/internal/core"
 	"github.com/TeddyGavi/bem-ls/internal/index"
 	"github.com/TeddyGavi/bem-ls/internal/lsp/jsonrpc"
 	"github.com/TeddyGavi/bem-ls/internal/lsp/protocol"
@@ -26,21 +26,22 @@ import (
 // Server is the language server. Create it with NewServer and call Run.
 type Server struct {
 	version string
-	log     *log.Logger
+	log     *core.Logger
 	conn    *jsonrpc.Conn
 
-	mu          sync.Mutex
-	initialized bool
-	shutdown    bool
-	root        string
-	encoding    string
-	caps        clientCaps
-	cfg         *compiled
-	ix          *index.Index
-	open        map[string]*openDoc // by path
-	timers      map[string]*time.Timer
-	scanCancel  context.CancelFunc
-	scanDone    chan struct{}
+	mu              sync.Mutex
+	initialized     bool
+	shutdown        bool
+	root            string
+	encoding        string
+	caps            clientCaps
+	cfg             *compiled
+	ix              *index.Index
+	open            map[string]*openDoc // by path
+	timers          map[string]*time.Timer
+	scanCancel      context.CancelFunc
+	scanDone        chan struct{}
+	initializedDone chan struct{}
 
 	// Settings come from the editor and from bem.config.json at the root;
 	// the file wins. Both are kept raw and merged on every change.
@@ -74,18 +75,20 @@ type openDoc struct {
 
 // NewServer returns a server. logger receives diagnostics about the server
 // itself; it must not write to standard output.
-func NewServer(version string, logger *log.Logger) *Server {
+func NewServer(version string, logger *core.Logger) *Server {
 	if logger == nil {
-		logger = log.New(io.Discard, "", 0)
+		logger = core.NewLogger("lsp")
+		logger.SetOutput(io.Discard)
 	}
 	cfg, _ := compile(Settings{})
 	return &Server{
-		version:  version,
-		log:      logger,
-		encoding: protocol.EncodingUTF16,
-		cfg:      cfg,
-		open:     map[string]*openDoc{},
-		timers:   map[string]*time.Timer{},
+		version:         version,
+		log:             logger,
+		encoding:        protocol.EncodingUTF16,
+		cfg:             cfg,
+		open:            map[string]*openDoc{},
+		timers:          map[string]*time.Timer{},
+		initializedDone: make(chan struct{}),
 	}
 }
 
@@ -326,7 +329,7 @@ func (s *Server) initialize(raw json.RawMessage) (any, error) {
 	}
 	s.ix = ix
 	s.initialized = true
-	s.log.Printf("initialized: root=%s encoding=%s", s.root, s.encoding)
+	s.log.Infof("initialized: root=%s encoding=%s", s.root, s.encoding)
 
 	name := "bem-ls"
 	return protocol.InitializeResult{
@@ -392,13 +395,14 @@ func (s *Server) afterInitialized() {
 				}},
 			}, nil)
 			if err != nil {
-				s.log.Printf("registering file watchers: %v", err)
+				s.log.Infof("registering file watchers: %v", err)
 			}
 		}()
 	}
 	if scan {
 		s.startScan()
 	}
+	close(s.initializedDone)
 }
 
 func (s *Server) startScan() {
@@ -415,10 +419,10 @@ func (s *Server) startScan() {
 		defer close(done)
 		stats, err := ix.Scan(ctx)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			s.log.Printf("scan: %v", err)
+			s.log.Infof("scan: %v", err)
 			return
 		}
-		s.log.Printf("scan: %d files (%d failed) in %v", stats.Files, stats.Failed, stats.Duration)
+		s.log.Infof("scan: %d files (%d failed) in %v", stats.Files, stats.Failed, stats.Duration)
 		s.conn.Notify("window/logMessage", protocol.LogMessageParams{
 			Type:    protocol.MessageLog,
 			Message: fmt.Sprintf("BEM: indexed %d files in %v", stats.Files, stats.Duration.Round(time.Millisecond)),
@@ -429,6 +433,7 @@ func (s *Server) startScan() {
 
 // WaitForScan blocks until the background scan finishes (for tests).
 func (s *Server) WaitForScan() {
+	<-s.initializedDone
 	s.mu.Lock()
 	done := s.scanDone
 	s.mu.Unlock()
@@ -538,7 +543,7 @@ func (s *Server) pullConfiguration() {
 		"items": []map[string]any{{"section": "bem"}},
 	}, &res)
 	if err != nil {
-		s.log.Printf("workspace/configuration: %v", err)
+		s.log.Infof("workspace/configuration: %v", err)
 		return
 	}
 	if len(res) == 0 {
@@ -564,10 +569,10 @@ func (s *Server) loadConfigFileLocked() {
 	case errors.Is(err, os.ErrNotExist):
 	case err != nil:
 		s.fileErr = err
-		s.log.Printf("config: %v", err)
+		s.log.Infof("config: %v", err)
 	default:
 		s.fileRaw = raw
-		s.log.Printf("config: loaded %s", s.configPath)
+		s.log.Infof("config: loaded %s", s.configPath)
 	}
 }
 

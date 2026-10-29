@@ -13,12 +13,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/TeddyGavi/bem-ls/internal/core"
 	"github.com/TeddyGavi/bem-ls/internal/lsp"
 )
 
@@ -38,7 +37,7 @@ func main() {
 		return
 	}
 
-	var logOut io.Writer = os.Stderr
+	logger := core.NewLogger("bem-ls")
 	if *logFile != "" {
 		f, err := os.OpenFile(*logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 		if err != nil {
@@ -46,15 +45,14 @@ func main() {
 			os.Exit(1)
 		}
 		defer f.Close()
-		logOut = f
+		logger.SetOutput(f)
 	}
-	logger := log.New(logOut, "bem-ls: ", log.LstdFlags|log.Lmicroseconds)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	srv := lsp.NewServer(version, logger)
 	if err := srv.Run(ctx, os.Stdin, os.Stdout); err != nil {
-		logger.Printf("exit: %v", err)
+		logger.Errorf(err, "exit: %v", err)
 		os.Exit(1)
 	}
 }
