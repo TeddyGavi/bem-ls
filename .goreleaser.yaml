@@ -94,6 +94,16 @@ archives:
 checksum:
   name_template: checksums.txt
 
+signs:
+  - artifacts: checksum
+    cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - --yes
+
 snapshot:
   version_template: "{{ incpatch .Version }}-snapshot"
 
