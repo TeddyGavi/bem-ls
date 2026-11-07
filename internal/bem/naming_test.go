@@ -28,9 +28,9 @@ func TestParsePresets(t *testing.T) {
 		{PresetClassic, "card", "card|", "card"},
 		{PresetClassic, "card__title", "card|title", "card__title"},
 		{PresetClassic, "card__title--big", "card|title|big", "card__title"},
-		{PresetClassic, "plan-summary__old-plan__row1", "plan-summary|old-plan,row1", ""},
+		{PresetClassic, "order-overview__notice__row1", "order-overview|notice,row1", ""},
 		{PresetClassic, "card--big-one", "card||big-one", "card"},
-		{PresetClassic, "card__semi_annulus", `card|semi_annulus ERR element "semi_annulus" does not match lower-case kebab-case (e.g. my-name)`, ""},
+		{PresetClassic, "card__top_ribbon", `card|top_ribbon ERR element "top_ribbon" does not match lower-case kebab-case (e.g. my-name)`, ""},
 		{PresetClassic, "Card", `Card| ERR block "Card" does not match lower-case kebab-case (e.g. my-name)`, ""},
 		{PresetClassic, "card--a--b", "card||a ERR more than one modifier", "card"},
 		{PresetClassic, "card--a__b", `card||a ERR element "b" comes after the modifier`, "card"},
@@ -99,7 +99,7 @@ func TestPresetOverride(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !n.Parse("card__semi_annulus").Valid() {
+	if !n.Parse("card__top_ribbon").Valid() {
 		t.Error("overridden element pattern not used")
 	}
 	if n.ElementSep() != "__" || n.ModifierSep() != "--" {
@@ -122,7 +122,7 @@ func TestNewNamingErrors(t *testing.T) {
 
 func TestSuggest(t *testing.T) {
 	tests := []struct{ preset, class, want string }{
-		{PresetClassic, "card__semi_annulus", "card__semi-annulus"},
+		{PresetClassic, "card__top_ribbon", "card__top-ribbon"},
 		{PresetClassic, "myCard__titleText--isBig", "my-card__title-text--is-big"},
 		{PresetClassic, "HTMLPage", "html-page"},
 		{PresetClassic, "card--a__b", ""}, // structural: no guess

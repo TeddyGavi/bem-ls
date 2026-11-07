@@ -335,7 +335,7 @@ func (n *Naming) Format(block string, elements []string, mod, val string) string
 
 // Suggest returns a corrected spelling of an invalid name, or "" if it can't
 // find one. It only fixes the case and word separators of each part, e.g.
-// "card__semiAnnulus" becomes "card__semi-annulus" in the classic preset.
+// "card__topRibbon" becomes "card__top-ribbon" in the classic preset.
 func (n *Naming) Suggest(name Name) string {
 	if name.Valid() || name.StructErr || n.preset == PresetCustom {
 		return ""
@@ -365,7 +365,7 @@ func (n *Naming) Suggest(name Name) string {
 	return s
 }
 
-// words splits "semiAnnulus", "semi_annulus" or "Semi-Annulus" into
+// words splits "topRibbon", "top_ribbon" or "Top-Ribbon" into
 // lower-case words.
 func words(s string) []string {
 	var out []string
