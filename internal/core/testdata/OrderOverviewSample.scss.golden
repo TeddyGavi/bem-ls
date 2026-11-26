@@ -1,0 +1,25 @@
+.order-overview {
+  &--pending {}
+  &--pending-indicator {}
+  &__top_ribbon {
+    img {}
+  }
+  &__side_badge {
+    img {}
+  }
+  &__corner {
+    img {}
+  }
+  &__order__title {}
+  &__order__total-label {}
+  &__order__total-amount {}
+  &__order__total-breakdown {}
+  &__order__notice {
+    &__row1 {
+      &__icon {}
+      &__text {}
+    }
+    &__row2 {}
+  }
+  &__order__checkout {}
+}

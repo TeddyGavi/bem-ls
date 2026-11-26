@@ -1,0 +1,13 @@
+4:44 warning modifierWithoutBase: modifier "order-overview--pending-indicator" is used without "order-overview" on the same element
+5:25 warning invalidName: "order-overview__top_ribbon" does not follow the classic naming convention: element "top_ribbon" does not match lower-case kebab-case (e.g. my-name) (did you mean "order-overview__top-ribbon"?)
+6:25 warning invalidName: "order-overview__side_badge" does not follow the classic naming convention: element "side_badge" does not match lower-case kebab-case (e.g. my-name) (did you mean "order-overview__side-badge"?)
+8:25 info nestedElement: "order-overview__order__title" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__title"?)
+9:25 info nestedElement: "order-overview__order__total-label" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__total-label"?)
+10:25 info nestedElement: "order-overview__order__total-amount" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__total-amount"?)
+11:25 info nestedElement: "order-overview__order__total-breakdown" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__total-breakdown"?)
+16:31 info nestedElement: "order-overview__order__notice" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__notice"?)
+17:31 info nestedElement: "order-overview__order__notice__row1" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__row1"?)
+18:33 info nestedElement: "order-overview__order__notice__row1__icon" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__icon"?)
+19:33 info nestedElement: "order-overview__order__notice__row1__text" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__text"?)
+21:31 info nestedElement: "order-overview__order__notice__row2" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__row2"?)
+27:34 info nestedElement: "order-overview__order__checkout" is an element of an element; BEM elements belong directly to the block "order-overview" (did you mean "order-overview__checkout"?)

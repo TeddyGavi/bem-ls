@@ -1,0 +1,19 @@
+.event-popover {
+  &__body {
+    &__title {}
+    &__venue {}
+    &__pricing {
+      &__label {}
+      &__amount {}
+      &__unit {}
+    }
+    &__logistics {
+      &__clock-icon {}
+      &__details {}
+      &__attendance {
+        &__ticket-icon {}
+        &__details {}
+      }
+    }
+  }
+}

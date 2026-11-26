@@ -1,0 +1,12 @@
+21:25 info nestedElement: "event-popover__body__title" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__title"?)
+24:25 info nestedElement: "event-popover__body__venue" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__venue"?)
+27:25 info nestedElement: "event-popover__body__pricing" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__pricing"?)
+28:28 info nestedElement: "event-popover__body__pricing__label" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__label"?)
+31:28 info nestedElement: "event-popover__body__pricing__amount" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__amount"?)
+34:28 info nestedElement: "event-popover__body__pricing__unit" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__unit"?)
+38:25 info nestedElement: "event-popover__body__logistics" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__logistics"?)
+40:24 info nestedElement: "event-popover__body__logistics__clock-icon" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__clock-icon"?)
+44:27 info nestedElement: "event-popover__body__logistics__details" is an element of an element; BEM elements belong directly to the block "event-popover"
+49:27 info nestedElement: "event-popover__body__logistics__attendance" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__attendance"?)
+51:26 info nestedElement: "event-popover__body__logistics__attendance__ticket-icon" is an element of an element; BEM elements belong directly to the block "event-popover" (did you mean "event-popover__ticket-icon"?)
+55:29 info nestedElement: "event-popover__body__logistics__attendance__details" is an element of an element; BEM elements belong directly to the block "event-popover"
